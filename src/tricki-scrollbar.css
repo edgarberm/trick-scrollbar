@@ -10,21 +10,48 @@
   perspective: 1px;
 }
 
+.scrolling .cs-perspective-wrapper {
+  user-select: none;
+  -moz-user-select: none;
+  pointer-events: none;
+}
+
 .cs-perspective-wrapper {
-  perspective-origin: top right;
-  transform-style: preserve-3d;
+  position: absolute;
   width: 100%;
   padding-right: 30px;
-  position: absolute;
+  perspective-origin: top right;
+  transform-style: preserve-3d;
+  user-select: all;
+  -moz-user-select: all;
+  pointer-events: all;
 }
 
 .cs-thumb {
   position: absolute;
   top: 0;
-  right: -6px;
+  right: 0;
   width: 6px;
   border-radius: 3px;
-  background-color: rgba(0, 0, 0, 0.05);
+  background-color: rgba(0, 0, 0, 0.1);
+  opacity: 0;
   transform-origin: top right;
-  pointer-events: initial;
+  pointer-events: all;
+  z-index: 9;
+  transition: width 0.25s ease,
+  opacity 0.25s ease 0.25s,
+  background-color 0.25s ease,
+  border-radius 0.25s ease;
+}
+
+.cs-scrollable:hover .cs-thumb {
+  opacity: 1;
+}
+
+.scrolling .cs-thumb,
+.cs-thumb:hover {
+  opacity: 1;
+  width: 8px;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
 }

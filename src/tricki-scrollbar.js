@@ -1,29 +1,34 @@
-function TrickiScrollbar (element) {
-  let dragging = false
-  let lastY = 0
+class TrickiScrollbar {
 
-  createTrickiScrollbar(element)
+  constructor(element) {
+    this.dragging = false
+    this.lastY = 0
+    
+    this.createTrickiScrollbar(element)
+    this.updateThumb(element)
+  }
 
-  function onDragStart (event) {
-    dragging = true
+
+  onDragStart (event) {
+    this.dragging = true
     this.classList.add('scrolling')
-    lastY = event.clientY || event.clientY === 0 ? event.clientY : event.touches[0].clientY
+    this.lastY = event.clientY || event.clientY === 0 ? event.clientY : event.touches[0].clientY
   }
   
-  function onDrag (event) {
-    if (!dragging) return
+  onDrag (event) {
+    if (!this.dragging) return
     const clientY = event.clientY || event.clientY === 0 ? event.clientY : event.touches[0].clientY
-    this.scrollTop += (clientY - lastY) / this.thumb.scaling
-    lastY = clientY
+    this.scrollTop += (clientY - this.lastY) / this.thumb.scaling
+    this.lastY = clientY
     event.preventDefault()
   }
   
-  function onDragEnd () {
-    dragging = false
+  onDragEnd () {
+    this.dragging = false
     this.classList.remove('scrolling')
   }
 
-  function updateThumb (scrollable) {
+  updateThumb (scrollable) {
     const thumb = scrollable.thumb
     const bounding = scrollable.getBoundingClientRect()
     const scrollHeight = scrollable.scrollHeight
@@ -60,8 +65,10 @@ function TrickiScrollbar (element) {
     }
   }
 
-  function createTrickiScrollbar (scrollable) {
-    const fn = () => updateThumb(scrollable)
+  createTrickiScrollbar (scrollable) {
+    console.log('sisisi');
+    
+    const fn = () => this.updateThumb(scrollable)
     const perspectiveWrapper = document.createElement('div')
     const thumb = document.createElement('div')
 
@@ -83,7 +90,7 @@ function TrickiScrollbar (element) {
     scrollable.thumb = thumb
     scrollable.perspectiveWrapper = perspectiveWrapper
 
-    // We are on Safari, where we need to use the sticky trick!
+    // Safari trick
     if (getComputedStyle(scrollable).webkitOverflowScrolling) {
       scrollable.isIOS = true
       thumb.style.right = ''
@@ -98,12 +105,12 @@ function TrickiScrollbar (element) {
         .forEach((e) => { perspectiveWrapper.appendChild(e) })
     }
 
-    scrollable.thumb.addEventListener('mousedown', onDragStart.bind(scrollable), { passive: true })
-    window.addEventListener('mousemove', onDrag.bind(scrollable))
-    window.addEventListener('mouseup', onDragEnd.bind(scrollable), { passive: true })
-    scrollable.thumb.addEventListener('touchstart', onDragStart.bind(scrollable), { passive: true })
-    window.addEventListener('touchmove', onDrag.bind(scrollable))
-    window.addEventListener('touchend', onDragEnd.bind(scrollable), { passive: true })
+    scrollable.thumb.addEventListener('mousedown', this.onDragStart.bind(scrollable), { passive: true })
+    window.addEventListener('mousemove', this.onDrag.bind(scrollable))
+    window.addEventListener('mouseup', this.onDragEnd.bind(scrollable), { passive: true })
+    scrollable.thumb.addEventListener('touchstart', this.onDragStart.bind(scrollable), { passive: true })
+    window.addEventListener('touchmove', this.onDrag.bind(scrollable))
+    window.addEventListener('touchend', this.onDragEnd.bind(scrollable), { passive: true })
 
     requestAnimationFrame(fn)
     window.addEventListener('resize', fn)

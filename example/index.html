@@ -51,6 +51,7 @@
   <div class="scroll">
     <div class="wrapper">
       <h1>Lorem Ipsum</h1>
+      <h2>Dolor sit amet</h2>
 
       <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et
         dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet
@@ -99,8 +100,8 @@
   <script src="../src/tricki-scrollbar.js"></script>
 
   <script>
-    const scroller = document.querySelector('.wrapper')
-    TrickiScrollbar(scroller)
+    const wrapper = document.querySelector('.wrapper')
+    const scroller = new TrickiScrollbar(wrapper)
   </script>
 </body>
 

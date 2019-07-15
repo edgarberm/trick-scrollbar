@@ -1,29 +1,40 @@
-function TrickiScrollbar (element) {
-  let dragging = false
-  let lastY = 0
+/**
+ * @class: TrickiScrollbar
+ */
+class TrickiScrollbar {
 
-  createTrickiScrollbar(element)
+  constructor(element) {
+    this.dragging = false
+    this.lastY = 0
+    this.thumb
+    
+    this.createTrickiScrollbar(element)
+    this.updateThumb(element)
+  }
 
-  function onDragStart (event) {
-    dragging = true
+
+  onDragStart (event) {
+    this.dragging = true
     this.classList.add('scrolling')
-    lastY = event.clientY || event.clientY === 0 ? event.clientY : event.touches[0].clientY
+    this.lastY = event.clientY || event.clientY === 0 ? event.clientY : event.touches[0].clientY
   }
   
-  function onDrag (event) {
-    if (!dragging) return
+  onDrag (event) {
+    if (!this.dragging) return
+
     const clientY = event.clientY || event.clientY === 0 ? event.clientY : event.touches[0].clientY
-    this.scrollTop += (clientY - lastY) / this.thumb.scaling
-    lastY = clientY
+    this.scrollTop += (clientY - this.lastY) / this.thumb.scaling
+    this.lastY = clientY
+
     event.preventDefault()
   }
   
-  function onDragEnd () {
-    dragging = false
+  onDragEnd () {
+    this.dragging = false
     this.classList.remove('scrolling')
   }
 
-  function updateThumb (scrollable) {
+  updateThumb (scrollable) {
     const thumb = scrollable.thumb
     const bounding = scrollable.getBoundingClientRect()
     const scrollHeight = scrollable.scrollHeight
@@ -37,6 +48,8 @@ function TrickiScrollbar (element) {
     thumb.scaling = maxTopOffset / maxScrollTop
     thumb.style.height = `${thumbHeight}px`
 
+    // I don't remember where I found this piece of code. 
+    // If anyone knows, please contact me.
     if (scrollable.isIOS) {
       const z = 1 - 1 / (1 + thumb.scaling)
       thumb.nextElementSibling.style.marginTop = `-${thumbHeight}px`
@@ -60,10 +73,11 @@ function TrickiScrollbar (element) {
     }
   }
 
-  function createTrickiScrollbar (scrollable) {
-    const fn = () => updateThumb(scrollable)
+  createTrickiScrollbar (scrollable) {
+    const fn = () => this.updateThumb(scrollable)
     const perspectiveWrapper = document.createElement('div')
     const thumb = document.createElement('div')
+    alert('sisisi')
 
     if (getComputedStyle(document.body).transform == 'none') {
       document.body.style.transform = 'translateZ(0)'
@@ -83,8 +97,8 @@ function TrickiScrollbar (element) {
     scrollable.thumb = thumb
     scrollable.perspectiveWrapper = perspectiveWrapper
 
-    // We are on Safari, where we need to use the sticky trick!
-    if (getComputedStyle(scrollable).webkitOverflowScrolling) {
+    // Safari trick
+    if (window.safari !== undefined) {
       scrollable.isIOS = true
       thumb.style.right = ''
       thumb.style.left = '100%'
@@ -98,15 +112,17 @@ function TrickiScrollbar (element) {
         .forEach((e) => { perspectiveWrapper.appendChild(e) })
     }
 
-    scrollable.thumb.addEventListener('mousedown', onDragStart.bind(scrollable), { passive: true })
-    window.addEventListener('mousemove', onDrag.bind(scrollable))
-    window.addEventListener('mouseup', onDragEnd.bind(scrollable), { passive: true })
-    scrollable.thumb.addEventListener('touchstart', onDragStart.bind(scrollable), { passive: true })
-    window.addEventListener('touchmove', onDrag.bind(scrollable))
-    window.addEventListener('touchend', onDragEnd.bind(scrollable), { passive: true })
+    scrollable.thumb.addEventListener('mousedown', this.onDragStart.bind(scrollable), { passive: true })
+    window.addEventListener('mousemove', this.onDrag.bind(scrollable))
+    window.addEventListener('mouseup', this.onDragEnd.bind(scrollable), { passive: true })
+
+    scrollable.thumb.addEventListener('touchstart', this.onDragStart.bind(scrollable), { passive: true })
+    window.addEventListener('touchmove', this.onDrag.bind(scrollable))
+    window.addEventListener('touchend', this.onDragEnd.bind(scrollable), { passive: true })
 
     requestAnimationFrame(fn)
     window.addEventListener('resize', fn)
+
     return fn
   }
 }

@@ -79,4 +79,5 @@ const scroller = new TrickScrollbar(wrapper)
 - [ ] Add CSS variables
 - [ ] Hide scrollbar when mouse is stopped
 - [ ] Finish the doc
+- [ ] Add tests
 - [ ] Publish to `npm`

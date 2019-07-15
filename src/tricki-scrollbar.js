@@ -1,8 +1,12 @@
+/**
+ * @class: TrickiScrollbar
+ */
 class TrickiScrollbar {
 
   constructor(element) {
     this.dragging = false
     this.lastY = 0
+    this.thumb
     
     this.createTrickiScrollbar(element)
     this.updateThumb(element)
@@ -17,9 +21,11 @@ class TrickiScrollbar {
   
   onDrag (event) {
     if (!this.dragging) return
+
     const clientY = event.clientY || event.clientY === 0 ? event.clientY : event.touches[0].clientY
     this.scrollTop += (clientY - this.lastY) / this.thumb.scaling
     this.lastY = clientY
+
     event.preventDefault()
   }
   
@@ -42,6 +48,8 @@ class TrickiScrollbar {
     thumb.scaling = maxTopOffset / maxScrollTop
     thumb.style.height = `${thumbHeight}px`
 
+    // I don't remember where I found this piece of code. 
+    // If anyone knows, please contact me.
     if (scrollable.isIOS) {
       const z = 1 - 1 / (1 + thumb.scaling)
       thumb.nextElementSibling.style.marginTop = `-${thumbHeight}px`
@@ -66,11 +74,10 @@ class TrickiScrollbar {
   }
 
   createTrickiScrollbar (scrollable) {
-    console.log('sisisi');
-    
     const fn = () => this.updateThumb(scrollable)
     const perspectiveWrapper = document.createElement('div')
     const thumb = document.createElement('div')
+    alert('sisisi')
 
     if (getComputedStyle(document.body).transform == 'none') {
       document.body.style.transform = 'translateZ(0)'
@@ -91,7 +98,7 @@ class TrickiScrollbar {
     scrollable.perspectiveWrapper = perspectiveWrapper
 
     // Safari trick
-    if (getComputedStyle(scrollable).webkitOverflowScrolling) {
+    if (window.safari !== undefined) {
       scrollable.isIOS = true
       thumb.style.right = ''
       thumb.style.left = '100%'
@@ -108,12 +115,14 @@ class TrickiScrollbar {
     scrollable.thumb.addEventListener('mousedown', this.onDragStart.bind(scrollable), { passive: true })
     window.addEventListener('mousemove', this.onDrag.bind(scrollable))
     window.addEventListener('mouseup', this.onDragEnd.bind(scrollable), { passive: true })
+
     scrollable.thumb.addEventListener('touchstart', this.onDragStart.bind(scrollable), { passive: true })
     window.addEventListener('touchmove', this.onDrag.bind(scrollable))
     window.addEventListener('touchend', this.onDragEnd.bind(scrollable), { passive: true })
 
     requestAnimationFrame(fn)
     window.addEventListener('resize', fn)
+
     return fn
   }
 }

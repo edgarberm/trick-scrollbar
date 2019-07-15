@@ -1,0 +1,40 @@
+{
+  "name": "trick-scrollbar",
+  "version": "1.0.0",
+  "description": "The native browser's scrollbar customized with some magic tricks",
+  "author": "builtbyedgar <hello@builtbyedgar.com>",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:builtbyedgar/trick-scrollbar.git"
+  },
+  "bugs": {
+    "url": "https://github.com/builtbyedgar/trick-scrollbar/issues"
+  },
+  "license": "MIT",
+  "keywords": [
+    "scroll",
+    "scrollbar"
+  ],
+  "main": "dist/trick-scrollbar.common.js",
+  "module": "dist/trick-scrollbar.esm.js",
+  "style": "css/trick-scrollbar.css",
+  "files": [
+    "css",
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "npm run clean && node build",
+    "clean": "rm -rf dist",
+    "watch": "npm run build && SHELL=/bin/bash chokidar 'src/*.js' -c 'npm run format && npm run build'",
+    "format": "prettier --write --single-quote --trailing-comma es5 'src/*.js'"
+  },
+  "dependencies": {
+    "chokidar-cli": "^1.2.0",
+    "path": "^0.12.7",
+    "prettier": "^1.7.0",
+    "rollup": "^0.50.0",
+    "rollup-plugin-buble": "^0.16.0",
+    "uglify-js": "^3.1.2  "
+  }
+}

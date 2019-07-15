@@ -1,7 +1,7 @@
 /**
  * @class: TrickScrollbar
  */
-class TrickScrollbar {
+export default class TrickScrollbar {
 
   constructor(element) {
     this.dragging = false

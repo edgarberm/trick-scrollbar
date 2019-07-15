@@ -48,10 +48,10 @@ You need to include the `trick-scrollbar.css` file.
 <link rel="stylesheet" href="css/trick-scrollbar.css">
 ```
 
-Import from `npm`:
+Import from ES module:
 
-```html
-// TODO.
+```js
+import TrickScrollbar from 'trick-scrollbar'
 ```
 
 Import in browser:

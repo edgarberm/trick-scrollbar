@@ -77,7 +77,6 @@ class TrickiScrollbar {
     const fn = () => this.updateThumb(scrollable)
     const perspectiveWrapper = document.createElement('div')
     const thumb = document.createElement('div')
-    alert('sisisi')
 
     if (getComputedStyle(document.body).transform == 'none') {
       document.body.style.transform = 'translateZ(0)'
@@ -125,4 +124,5 @@ class TrickiScrollbar {
 
     return fn
   }
+  
 }

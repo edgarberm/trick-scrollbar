@@ -1,6 +1,6 @@
 <h1 align="center">trick-scrollbar</h1>
 
-<p align="center">CSS Customization for your browser native scrollbar<p>
+<p align="center">The browser's own scroll but customized with some magic tricks<p>
 
 ________
 

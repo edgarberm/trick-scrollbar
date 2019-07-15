@@ -58,7 +58,7 @@ To initialise:
 
 ```js
 const wrapper = document.querySelector('.wrapper')
-const scroller = new TrickiScrollbar(wrapper)
+const scroller = new TrickScrollbar(wrapper)
 ```
 
 ## License

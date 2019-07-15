@@ -70,4 +70,5 @@ const scroller = new TrickiScrollbar(wrapper)
 
 - [ ] Finish the doc
 - [ ] Add support to horizontal scroll
+- [ ] Hide scrollbar when mouse is stopped
 - [ ] Publish to `npm`

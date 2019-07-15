@@ -1,14 +1,14 @@
 /**
- * @class: TrickiScrollbar
+ * @class: TrickScrollbar
  */
-class TrickiScrollbar {
+class TrickScrollbar {
 
   constructor(element) {
     this.dragging = false
     this.lastY = 0
     this.thumb
     
-    this.createTrickiScrollbar(element)
+    this.createTrickScrollbar(element)
     this.updateThumb(element)
   }
 
@@ -73,7 +73,7 @@ class TrickiScrollbar {
     }
   }
 
-  createTrickiScrollbar (scrollable) {
+  createTrickScrollbar (scrollable) {
     const fn = () => this.updateThumb(scrollable)
     const perspectiveWrapper = document.createElement('div')
     const thumb = document.createElement('div')

@@ -1,13 +1,17 @@
 <h1 align="center">trick-scrollbar</h1>
 
 <p align="center">The native browser's scrollbar customized with some magic tricks<p>
+<p align="center">
+  <img src="https://travis-ci.org/builtbyedgar/trick-scrollbar.svg?branch=master" alt="Build">
+  <img src="https://img.shields.io/badge/license-MIT-green.svg" alt="License">
+</p>
 
 ________
 
 ## Why trick-scrollbar?
 
-Simply because **trick-scrollbar** uses in native browser scroll but with some 
-JavaScript CSS tricks.
+**trick-scrollbar** don't emulate a scroll, it's the browser's own scroll but 
+customized with some magic tricks.
 
 * It's native, it's efficient.
 * Use plain `scrollTo`, `scrollTop` and all js methods.
@@ -21,10 +25,6 @@ Coming soon..
 
 
 ## How to use
-
-trick-scrollbar don't emulate a scroll, it's the browser's own scroll but 
-customized with some magic tricks. For this reason, it's necessary to have 
-some points in mind.
 
 First, don't set the CSS `overflow` as `hidden` because the scroll **won't work**.
 

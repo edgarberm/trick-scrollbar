@@ -22,8 +22,6 @@
   padding-right: 30px;
   perspective-origin: top right;
   transform-style: preserve-3d;
-  user-select: all;
-  -moz-user-select: all;
   pointer-events: all;
 }
 

@@ -1,37 +1,48 @@
-/**
- * @class: TrickScrollbar
- */
 export default class TrickScrollbar {
-
-  constructor(element) {
+  constructor (element) {
     this.dragging = false
+    this.scrolling = false
     this.lastY = 0
     this.thumb
-    
+
     this.createTrickScrollbar(element)
     this.updateThumb(element)
   }
 
-
   onDragStart (event) {
     this.dragging = true
     this.classList.add('scrolling')
-    this.lastY = event.clientY || event.clientY === 0 ? event.clientY : event.touches[0].clientY
+    this.lastY =
+      event.clientY || event.clientY === 0
+        ? event.clientY
+        : event.touches[0].clientY
   }
-  
+
   onDrag (event) {
     if (!this.dragging) return
 
-    const clientY = event.clientY || event.clientY === 0 ? event.clientY : event.touches[0].clientY
+    const clientY =
+      event.clientY || event.clientY === 0
+        ? event.clientY
+        : event.touches[0].clientY
     this.scrollTop += (clientY - this.lastY) / this.thumb.scaling
     this.lastY = clientY
 
     event.preventDefault()
   }
-  
+
   onDragEnd () {
     this.dragging = false
     this.classList.remove('scrolling')
+  }
+
+  onWheel () {
+    this.classList.add('scrolling')
+    
+    window.clearTimeout(this.scrolling)
+    this.scrolling = setTimeout(() => {
+      this.classList.remove('scrolling')
+    }, 66)
   }
 
   updateThumb (scrollable) {
@@ -43,13 +54,13 @@ export default class TrickScrollbar {
     const maxTopOffset = bounding.height - thumbHeight
 
     scrollable.style.width = ''
-    scrollable.style.width = `calc(${getComputedStyle(scrollable).width} + 20px)`
+    scrollable.style.width = `calc(${
+      getComputedStyle(scrollable).width
+    } + 20px)`
 
     thumb.scaling = maxTopOffset / maxScrollTop
     thumb.style.height = `${thumbHeight}px`
 
-    // I don't remember where I found this piece of code. 
-    // If anyone knows, please contact me.
     if (scrollable.isIOS) {
       const z = 1 - 1 / (1 + thumb.scaling)
       thumb.nextElementSibling.style.marginTop = `-${thumbHeight}px`
@@ -92,7 +103,7 @@ export default class TrickScrollbar {
 
     scrollable.insertBefore(perspectiveWrapper, scrollable.firstChild)
     scrollable.appendChild(thumb)
-    
+
     scrollable.thumb = thumb
     scrollable.perspectiveWrapper = perspectiveWrapper
 
@@ -107,22 +118,37 @@ export default class TrickScrollbar {
       perspectiveWrapper.style.width = ''
       perspectiveWrapper.style.position = ''
       Array.from(scrollable.children)
-        .filter((e) => e !== perspectiveWrapper)
-        .forEach((e) => { perspectiveWrapper.appendChild(e) })
+        .filter(e => e !== perspectiveWrapper)
+        .forEach(e => {
+          perspectiveWrapper.appendChild(e)
+        })
     }
 
-    scrollable.thumb.addEventListener('mousedown', this.onDragStart.bind(scrollable), { passive: true })
-    window.addEventListener('mousemove', this.onDrag.bind(scrollable))
-    window.addEventListener('mouseup', this.onDragEnd.bind(scrollable), { passive: true })
+    scrollable.addEventListener('wheel', this.onWheel)
 
-    scrollable.thumb.addEventListener('touchstart', this.onDragStart.bind(scrollable), { passive: true })
+    scrollable.thumb.addEventListener(
+      'mousedown',
+      this.onDragStart.bind(scrollable),
+      { passive: true }
+    )
+    window.addEventListener('mousemove', this.onDrag.bind(scrollable))
+    window.addEventListener('mouseup', this.onDragEnd.bind(scrollable), {
+      passive: true
+    })
+
+    scrollable.thumb.addEventListener(
+      'touchstart',
+      this.onDragStart.bind(scrollable),
+      { passive: true }
+    )
     window.addEventListener('touchmove', this.onDrag.bind(scrollable))
-    window.addEventListener('touchend', this.onDragEnd.bind(scrollable), { passive: true })
+    window.addEventListener('touchend', this.onDragEnd.bind(scrollable), {
+      passive: true
+    })
 
     requestAnimationFrame(fn)
     window.addEventListener('resize', fn)
 
     return fn
   }
-  
 }

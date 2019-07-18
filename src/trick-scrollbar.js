@@ -97,6 +97,7 @@ export default class TrickScrollbar {
     this.thumb = document.createElement('div')
 
     this.wrapper.classList.add('ts-scroll-content')
+    this.scroller.classList.add('ts-scroller')
     this.scrollbar.classList.add('ts-scrollbar')
     this.thumb.classList.add('ts-thumb')
 

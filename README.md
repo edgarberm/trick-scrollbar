@@ -71,7 +71,7 @@ const scroller = new TrickScrollbar(scrollContainer)
 ## TODO
 
 - [ ] Add support to horizontal scroll
-- [ ] Test in old browsers
+- [x] Test in all browsers
 - [ ] Add CSS variables
 - [ ] Hide scrollbar when mouse is stopped
 - [ ] Finish the doc

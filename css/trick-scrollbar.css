@@ -19,7 +19,6 @@
 .cs-perspective-wrapper {
   position: absolute;
   width: 100%;
-  padding-right: 30px;
   perspective-origin: top right;
   transform-style: preserve-3d;
   pointer-events: all;
@@ -46,7 +45,7 @@
   opacity: 1;
 }
 
-.scrolling .cs-thumb,
+.dragging .cs-thumb,
 .cs-thumb:hover {
   opacity: 1;
   width: 8px;

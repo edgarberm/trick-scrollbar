@@ -12,7 +12,7 @@ var TrickScrollbar = function TrickScrollbar (element) {
 
 TrickScrollbar.prototype.onDragStart = function onDragStart (event) {
   this.dragging = true;
-  this.classList.add('scrolling');
+  this.classList.add('dragging');
   this.lastY =
     event.clientY || event.clientY === 0
       ? event.clientY
@@ -34,7 +34,7 @@ TrickScrollbar.prototype.onDrag = function onDrag (event) {
 
 TrickScrollbar.prototype.onDragEnd = function onDragEnd () {
   this.dragging = false;
-  this.classList.remove('scrolling');
+  this.classList.remove('dragging');
 };
 
 TrickScrollbar.prototype.onWheel = function onWheel () {
@@ -57,7 +57,7 @@ TrickScrollbar.prototype.updateThumb = function updateThumb (scrollable) {
   var maxTopOffset = bounding.height - thumbHeight;
 
   scrollable.style.width = '';
-  scrollable.style.width = "calc(" + (getComputedStyle(scrollable).width) + " + 20px)";
+  scrollable.style.width = "" + (getComputedStyle(scrollable).width);
 
   thumb.scaling = maxTopOffset / maxScrollTop;
   thumb.style.height = thumbHeight + "px";
@@ -65,9 +65,9 @@ TrickScrollbar.prototype.updateThumb = function updateThumb (scrollable) {
   if (scrollable.isIOS) {
     var z = 1 - 1 / (1 + thumb.scaling);
     thumb.nextElementSibling.style.marginTop = "-" + thumbHeight + "px";
-    thumb.style.transform = "\n        translateZ(" + z + "px)\n        scale(" + (1 - z) + ")\n        translateX(-22px)\n      ";
+    thumb.style.transform = "\n        translateZ(" + z + "px)\n        scale(" + (1 - z) + ")\n        translateX(-2px)\n      ";
   } else {
-    thumb.style.transform = "\n         scale(" + (1 / thumb.scaling) + ")\n         matrix3d(\n           1, 0, 0, 0,\n           0, 1, 0, 0,\n           0, 0, 1, 0,\n           0, 0, 0, -1\n         )\n         translateZ(" + (-2 + 1 - 1 / thumb.scaling) + "px)\n         translateX(-22px)\n      ";
+    thumb.style.transform = "\n         scale(" + (1 / thumb.scaling) + ")\n         matrix3d(\n           1, 0, 0, 0,\n           0, 1, 0, 0,\n           0, 0, 1, 0,\n           0, 0, 0, -1\n         )\n         translateZ(" + (-2 + 1 - 1 / thumb.scaling) + "px)\n         translateX(-2px)\n      ";
   }
 };
 
@@ -91,7 +91,7 @@ TrickScrollbar.prototype.createTrickScrollbar = function createTrickScrollbar (s
   }
 
   scrollable.insertBefore(perspectiveWrapper, scrollable.firstChild);
-  scrollable.appendChild(thumb);
+  perspectiveWrapper.appendChild(thumb);
 
   scrollable.thumb = thumb;
   scrollable.perspectiveWrapper = perspectiveWrapper;
@@ -115,25 +115,13 @@ TrickScrollbar.prototype.createTrickScrollbar = function createTrickScrollbar (s
 
   scrollable.addEventListener('wheel', this.onWheel);
 
-  scrollable.thumb.addEventListener(
-    'mousedown',
-    this.onDragStart.bind(scrollable),
-    { passive: true }
-  );
+  scrollable.thumb.addEventListener('mousedown', this.onDragStart.bind(scrollable), { passive: true });
   window.addEventListener('mousemove', this.onDrag.bind(scrollable));
-  window.addEventListener('mouseup', this.onDragEnd.bind(scrollable), {
-    passive: true
-  });
+  window.addEventListener('mouseup', this.onDragEnd.bind(scrollable), { passive: true });
 
-  scrollable.thumb.addEventListener(
-    'touchstart',
-    this.onDragStart.bind(scrollable),
-    { passive: true }
-  );
+  scrollable.thumb.addEventListener('touchstart', this.onDragStart.bind(scrollable), { passive: true });
   window.addEventListener('touchmove', this.onDrag.bind(scrollable));
-  window.addEventListener('touchend', this.onDragEnd.bind(scrollable), {
-    passive: true
-  });
+  window.addEventListener('touchend', this.onDragEnd.bind(scrollable), { passive: true });
 
   requestAnimationFrame(fn);
   window.addEventListener('resize', fn);

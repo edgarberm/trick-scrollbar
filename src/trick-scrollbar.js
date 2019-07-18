@@ -69,6 +69,27 @@ export default class TrickScrollbar {
     window.removeEventListener('mousemove', this.onThumbDragStart.bind(this))
   }
 
+  onScrollbarClick (event) {
+    const thumbHeight = parseFloat(this.thumb.style.height.slice(0, -2))
+    const correctedY = event.clientY - (thumbHeight / 2)
+    const perc = correctedY / this.scroller.offsetHeight
+    const posY = this.scroller.scrollHeight * perc
+    const diff = posY - this.scroller.scrollTop
+    const interval = diff / 12
+    let x = 0
+
+    const repeat = () => {
+      setTimeout(() => {
+        this.scroller.scrollTop += interval
+        x += 1
+
+        if (x < 12) repeat()
+      }, 16)
+    }
+
+    repeat()
+  }
+
   assembleDOM () {
     const parent = this.scroller.parentNode
     this.wrapper = document.createElement('div')
@@ -90,9 +111,11 @@ export default class TrickScrollbar {
 
     this.thumb.addEventListener('mousedown', this.onThumbMouseDown.bind(this))
     window.addEventListener('mouseup', this.onThumbDragStop.bind(this))
-
+    
     this.thumb.addEventListener('touchstart', this.onThumbMouseDown.bind(this))
     window.addEventListener('touchend', this.onThumbDragStop.bind(this))
+    
+    this.scrollbar.addEventListener('click', this.onScrollbarClick.bind(this))
 
     window.addEventListener('resize', debounce(this.onResize.bind(this), 250), false)
   }

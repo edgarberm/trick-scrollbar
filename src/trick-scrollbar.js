@@ -1,140 +1,122 @@
+'use strict';
+
 export default class TrickScrollbar {
   constructor (element) {
-    this.dragging = false
-    this.scrolling = false
-    this.lastY = 0
+    this.scroller = element
+    this.wrapper
+    this.scrollbar
     this.thumb
+    this.lastY
+    this.dragging = false
 
-    this.createTrickScrollbar(element)
-    this.updateThumb(element)
+    this.assembleDOM()
+    this.resizeScrollbar()
+    this.addEventListeners()
   }
 
-  onDragStart (event) {
+  handleScroll () {
+    this.lastY = (this.scroller.scrollTop / this.scroller.scrollHeight) * 100
+
+    window.requestAnimationFrame(() => {
+      this.moveScrollbar(this.lastY)
+    })
+  }
+
+  moveScrollbar (newY) {
+    this.thumb.style.top = `${newY}%`;
+  }
+
+  onResize () {
+    this.resizeScrollbar()
+  }
+
+  resizeScrollbar () {
+    const percent = this.wrapper.offsetHeight / this.scroller.scrollHeight
+    const height = this.wrapper.offsetHeight * percent
+    this.thumb.style.height = `${height}px`
+  }
+  
+  onThumbMouseDown () {
     this.dragging = true
-    this.classList.add('dragging')
-    this.lastY =
-      event.clientY || event.clientY === 0
-        ? event.clientY
-        : event.touches[0].clientY
-  }
+    this.wrapper.classList.add('dragging')
 
-  onDrag (event) {
-    if (!this.dragging) return
-
+    const top = this.thumb.style.top ? this.thumb.style.top : '0%'
+    const perc = parseFloat(top.slice(0, -1)) / 100
+    const posY = this.wrapper.offsetHeight * perc
     const clientY =
       event.clientY || event.clientY === 0
         ? event.clientY
         : event.touches[0].clientY
-    this.scrollTop += (clientY - this.lastY) / this.thumb.scaling
-    this.lastY = clientY
+    const offset = clientY - posY
 
-    event.preventDefault()
+    window.addEventListener('mousemove', this.onThumbDragStart.bind(this, offset))
+    window.addEventListener('touchmove', this.onThumbDragStart.bind(this, offset))
+
+    event.stopPropagation()
   }
 
-  onDragEnd () {
+  onThumbDragStart (offset, event) {
+    if (this.dragging) {
+      const perc = ((event.clientY - offset) / this.wrapper.offsetHeight)
+      const posY = this.scroller.scrollHeight * perc
+      this.scroller.scrollTop = posY
+    }
+  }
+
+  onThumbDragStop () {
     this.dragging = false
-    this.classList.remove('dragging')
+    this.wrapper.classList.remove('dragging')
+    window.removeEventListener('mousemove', this.onThumbDragStart.bind(this))
   }
 
-  onWheel () {
-    this.classList.add('scrolling')
-    
-    window.clearTimeout(this.scrolling)
-    this.scrolling = setTimeout(() => {
-      this.classList.remove('scrolling')
-    }, 66)
+  assembleDOM () {
+    const parent = this.scroller.parentNode
+    this.wrapper = document.createElement('div')
+    this.scrollbar = document.createElement('div')
+    this.thumb = document.createElement('div')
+
+    this.wrapper.classList.add('ts-scroll-content')
+    this.scrollbar.classList.add('ts-scrollbar')
+    this.thumb.classList.add('ts-thumb')
+
+    parent.appendChild(this.wrapper)
+    this.wrapper.appendChild(this.scroller)
+    this.scrollbar.appendChild(this.thumb)
+    this.wrapper.appendChild(this.scrollbar)
   }
 
-  updateThumb (scrollable) {
-    const thumb = scrollable.thumb
-    const bounding = scrollable.getBoundingClientRect()
-    const scrollHeight = scrollable.scrollHeight
-    const maxScrollTop = scrollHeight - bounding.height
-    const thumbHeight = Math.pow(bounding.height, 2) / scrollHeight
-    const maxTopOffset = bounding.height - thumbHeight
+  addEventListeners () {
+    this.scroller.addEventListener('scroll', this.handleScroll.bind(this))
 
-    scrollable.style.width = ''
-    scrollable.style.width = `${ getComputedStyle(scrollable).width }`
+    this.thumb.addEventListener('mousedown', this.onThumbMouseDown.bind(this))
+    window.addEventListener('mouseup', this.onThumbDragStop.bind(this))
 
-    thumb.scaling = maxTopOffset / maxScrollTop
-    thumb.style.height = `${thumbHeight}px`
+    this.thumb.addEventListener('touchstart', this.onThumbMouseDown.bind(this))
+    window.addEventListener('touchend', this.onThumbDragStop.bind(this))
 
-    if (scrollable.isIOS) {
-      const z = 1 - 1 / (1 + thumb.scaling)
-      thumb.nextElementSibling.style.marginTop = `-${thumbHeight}px`
-      thumb.style.transform = `
-        translateZ(${z}px)
-        scale(${1 - z})
-        translateX(-2px)
-      `
-    } else {
-      thumb.style.transform = `
-         scale(${1 / thumb.scaling})
-         matrix3d(
-           1, 0, 0, 0,
-           0, 1, 0, 0,
-           0, 0, 1, 0,
-           0, 0, 0, -1
-         )
-         translateZ(${-2 + 1 - 1 / thumb.scaling}px)
-         translateX(-2px)
-      `
-    }
+    window.addEventListener('resize', debounce(this.onResize.bind(this), 250), false)
   }
+}
 
-  createTrickScrollbar (scrollable) {
-    const fn = () => this.updateThumb(scrollable)
-    const perspectiveWrapper = document.createElement('div')
-    const thumb = document.createElement('div')
+/**
+ * Debounce function
+ * 
+ * @param {Function} fn 
+ * @param {Number} wait 
+ * @param {Object} options 
+ */
+const debounce = (fn, wait = 0, options = {}) => {
+  let timeout
 
-    if (getComputedStyle(document.body).transform == 'none') {
-      document.body.style.transform = 'translateZ(0)'
+  return (...args) => {
+    const inmediate = 'inmediate' in options ? !!options.inmediate : options.inmediate
+    const later = () => {
+      timeout = null
+      if (!inmediate) fn.apply(this, args)
     }
-
-    scrollable.classList.add('cs-scrollable')
-    perspectiveWrapper.classList.add('cs-perspective-wrapper')
-    thumb.classList.add('cs-thumb')
-
-    while (scrollable.firstChild) {
-      perspectiveWrapper.appendChild(scrollable.firstChild)
-    }
-
-    scrollable.insertBefore(perspectiveWrapper, scrollable.firstChild)
-    perspectiveWrapper.appendChild(thumb)
-
-    scrollable.thumb = thumb
-    scrollable.perspectiveWrapper = perspectiveWrapper
-
-    // Safari trick
-    if (window.safari !== undefined) {
-      scrollable.isIOS = true
-      thumb.style.right = ''
-      thumb.style.left = '100%'
-      thumb.style.position = '-webkit-sticky'
-      perspectiveWrapper.style.perspective = '1px'
-      perspectiveWrapper.style.height = ''
-      perspectiveWrapper.style.width = ''
-      perspectiveWrapper.style.position = ''
-      Array.from(scrollable.children)
-        .filter(e => e !== perspectiveWrapper)
-        .forEach(e => {
-          perspectiveWrapper.appendChild(e)
-        })
-    }
-
-    scrollable.addEventListener('wheel', this.onWheel)
-
-    scrollable.thumb.addEventListener('mousedown', this.onDragStart.bind(scrollable), { passive: true })
-    window.addEventListener('mousemove', this.onDrag.bind(scrollable))
-    window.addEventListener('mouseup', this.onDragEnd.bind(scrollable), { passive: true })
-
-    scrollable.thumb.addEventListener('touchstart', this.onDragStart.bind(scrollable), { passive: true })
-    window.addEventListener('touchmove', this.onDrag.bind(scrollable))
-    window.addEventListener('touchend', this.onDragEnd.bind(scrollable), { passive: true })
-
-    requestAnimationFrame(fn)
-    window.addEventListener('resize', fn)
-
-    return fn
+    const now = inmediate && !timeout
+    clearTimeout(timeout)
+    timeout = setTimeout(later, wait)
+    if (now) fn.apply(this, args)
   }
 }

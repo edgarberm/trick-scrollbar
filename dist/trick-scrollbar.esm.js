@@ -1,130 +1,157 @@
+'use strict';
+var this$1 = undefined;
+
+
 var TrickScrollbar = function TrickScrollbar (element) {
-  this.dragging = false;
-  this.scrolling = false;
-  this.lastY = 0;
+  this.scroller = element;
+  this.wrapper;
+  this.scrollbar;
   this.thumb;
+  this.lastY;
+  this.dragging = false;
 
-  this.createTrickScrollbar(element);
-  this.updateThumb(element);
+  this.assembleDOM();
+  this.resizeScrollbar();
+  this.addEventListeners();
 };
 
-TrickScrollbar.prototype.onDragStart = function onDragStart (event) {
+TrickScrollbar.prototype.handleScroll = function handleScroll () {
+    var this$1 = this;
+
+  this.lastY = (this.scroller.scrollTop / this.scroller.scrollHeight) * 100;
+
+  window.requestAnimationFrame(function () {
+    this$1.moveScrollbar(this$1.lastY);
+  });
+};
+
+TrickScrollbar.prototype.moveScrollbar = function moveScrollbar (newY) {
+  this.thumb.style.top = newY + "%";
+};
+
+TrickScrollbar.prototype.onResize = function onResize () {
+  this.resizeScrollbar();
+};
+
+TrickScrollbar.prototype.resizeScrollbar = function resizeScrollbar () {
+  var percent = this.wrapper.offsetHeight / this.scroller.scrollHeight;
+  var height = this.wrapper.offsetHeight * percent;
+  this.thumb.style.height = height + "px";
+};
+  
+TrickScrollbar.prototype.onThumbMouseDown = function onThumbMouseDown () {
   this.dragging = true;
-  this.classList.add('dragging');
-  this.lastY =
-    event.clientY || event.clientY === 0
-      ? event.clientY
-      : event.touches[0].clientY;
-};
+  this.wrapper.classList.add('dragging');
 
-TrickScrollbar.prototype.onDrag = function onDrag (event) {
-  if (!this.dragging) { return }
-
+  var top = this.thumb.style.top ? this.thumb.style.top : '0%';
+  var perc = parseFloat(top.slice(0, -1)) / 100;
+  var posY = this.wrapper.offsetHeight * perc;
   var clientY =
     event.clientY || event.clientY === 0
       ? event.clientY
       : event.touches[0].clientY;
-  this.scrollTop += (clientY - this.lastY) / this.thumb.scaling;
-  this.lastY = clientY;
+  var offset = clientY - posY;
 
-  event.preventDefault();
+  window.addEventListener('mousemove', this.onThumbDragStart.bind(this, offset));
+  window.addEventListener('touchmove', this.onThumbDragStart.bind(this, offset));
+
+  event.stopPropagation();
 };
 
-TrickScrollbar.prototype.onDragEnd = function onDragEnd () {
+TrickScrollbar.prototype.onThumbDragStart = function onThumbDragStart (offset, event) {
+  if (this.dragging) {
+    var perc = ((event.clientY - offset) / this.wrapper.offsetHeight);
+    var posY = this.scroller.scrollHeight * perc;
+    this.scroller.scrollTop = posY;
+  }
+};
+
+TrickScrollbar.prototype.onThumbDragStop = function onThumbDragStop () {
   this.dragging = false;
-  this.classList.remove('dragging');
+  this.wrapper.classList.remove('dragging');
+  window.removeEventListener('mousemove', this.onThumbDragStart.bind(this));
 };
 
-TrickScrollbar.prototype.onWheel = function onWheel () {
+TrickScrollbar.prototype.onScrollbarClick = function onScrollbarClick (event) {
     var this$1 = this;
 
-  this.classList.add('scrolling');
+  var thumbHeight = parseFloat(this.thumb.style.height.slice(0, -2));
+  var correctedY = event.clientY - (thumbHeight / 2);
+  var perc = correctedY / this.scroller.offsetHeight;
+  var posY = this.scroller.scrollHeight * perc;
+  var diff = posY - this.scroller.scrollTop;
+  var interval = diff / 12;
+  var x = 0;
+
+  var repeat = function () {
+    setTimeout(function () {
+      this$1.scroller.scrollTop += interval;
+      x += 1;
+
+      if (x < 12) { repeat(); }
+    }, 16);
+  };
+
+  repeat();
+};
+
+TrickScrollbar.prototype.assembleDOM = function assembleDOM () {
+  var parent = this.scroller.parentNode;
+  this.wrapper = document.createElement('div');
+  this.scrollbar = document.createElement('div');
+  this.thumb = document.createElement('div');
+
+  this.wrapper.classList.add('ts-scroll-content');
+  this.scrollbar.classList.add('ts-scrollbar');
+  this.thumb.classList.add('ts-thumb');
+
+  parent.appendChild(this.wrapper);
+  this.wrapper.appendChild(this.scroller);
+  this.scrollbar.appendChild(this.thumb);
+  this.wrapper.appendChild(this.scrollbar);
+};
+
+TrickScrollbar.prototype.addEventListeners = function addEventListeners () {
+  this.scroller.addEventListener('scroll', this.handleScroll.bind(this));
+
+  this.thumb.addEventListener('mousedown', this.onThumbMouseDown.bind(this));
+  window.addEventListener('mouseup', this.onThumbDragStop.bind(this));
     
-  window.clearTimeout(this.scrolling);
-  this.scrolling = setTimeout(function () {
-    this$1.classList.remove('scrolling');
-  }, 66);
+  this.thumb.addEventListener('touchstart', this.onThumbMouseDown.bind(this));
+  window.addEventListener('touchend', this.onThumbDragStop.bind(this));
+    
+  this.scrollbar.addEventListener('click', this.onScrollbarClick.bind(this));
+
+  window.addEventListener('resize', debounce(this.onResize.bind(this), 250), false);
 };
 
-TrickScrollbar.prototype.updateThumb = function updateThumb (scrollable) {
-  var thumb = scrollable.thumb;
-  var bounding = scrollable.getBoundingClientRect();
-  var scrollHeight = scrollable.scrollHeight;
-  var maxScrollTop = scrollHeight - bounding.height;
-  var thumbHeight = Math.pow(bounding.height, 2) / scrollHeight;
-  var maxTopOffset = bounding.height - thumbHeight;
+/**
+ * Debounce function
+ * 
+ * @param {Function} fn 
+ * @param {Number} wait 
+ * @param {Object} options 
+ */
+var debounce = function (fn, wait, options) {
+  if ( wait === void 0 ) wait = 0;
+  if ( options === void 0 ) options = {};
 
-  scrollable.style.width = '';
-  scrollable.style.width = "" + (getComputedStyle(scrollable).width);
+  var timeout;
 
-  thumb.scaling = maxTopOffset / maxScrollTop;
-  thumb.style.height = thumbHeight + "px";
+  return function () {
+    var args = [], len = arguments.length;
+    while ( len-- ) args[ len ] = arguments[ len ];
 
-  if (scrollable.isIOS) {
-    var z = 1 - 1 / (1 + thumb.scaling);
-    thumb.nextElementSibling.style.marginTop = "-" + thumbHeight + "px";
-    thumb.style.transform = "\n        translateZ(" + z + "px)\n        scale(" + (1 - z) + ")\n        translateX(-2px)\n      ";
-  } else {
-    thumb.style.transform = "\n         scale(" + (1 / thumb.scaling) + ")\n         matrix3d(\n           1, 0, 0, 0,\n           0, 1, 0, 0,\n           0, 0, 1, 0,\n           0, 0, 0, -1\n         )\n         translateZ(" + (-2 + 1 - 1 / thumb.scaling) + "px)\n         translateX(-2px)\n      ";
+    var inmediate = 'inmediate' in options ? !!options.inmediate : options.inmediate;
+    var later = function () {
+      timeout = null;
+      if (!inmediate) { fn.apply(this$1, args); }
+    };
+    var now = inmediate && !timeout;
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+    if (now) { fn.apply(this$1, args); }
   }
-};
-
-TrickScrollbar.prototype.createTrickScrollbar = function createTrickScrollbar (scrollable) {
-    var this$1 = this;
-
-  var fn = function () { return this$1.updateThumb(scrollable); };
-  var perspectiveWrapper = document.createElement('div');
-  var thumb = document.createElement('div');
-
-  if (getComputedStyle(document.body).transform == 'none') {
-    document.body.style.transform = 'translateZ(0)';
-  }
-
-  scrollable.classList.add('cs-scrollable');
-  perspectiveWrapper.classList.add('cs-perspective-wrapper');
-  thumb.classList.add('cs-thumb');
-
-  while (scrollable.firstChild) {
-    perspectiveWrapper.appendChild(scrollable.firstChild);
-  }
-
-  scrollable.insertBefore(perspectiveWrapper, scrollable.firstChild);
-  perspectiveWrapper.appendChild(thumb);
-
-  scrollable.thumb = thumb;
-  scrollable.perspectiveWrapper = perspectiveWrapper;
-
-  // Safari trick
-  if (window.safari !== undefined) {
-    scrollable.isIOS = true;
-    thumb.style.right = '';
-    thumb.style.left = '100%';
-    thumb.style.position = '-webkit-sticky';
-    perspectiveWrapper.style.perspective = '1px';
-    perspectiveWrapper.style.height = '';
-    perspectiveWrapper.style.width = '';
-    perspectiveWrapper.style.position = '';
-    Array.from(scrollable.children)
-      .filter(function (e) { return e !== perspectiveWrapper; })
-      .forEach(function (e) {
-        perspectiveWrapper.appendChild(e);
-      });
-  }
-
-  scrollable.addEventListener('wheel', this.onWheel);
-
-  scrollable.thumb.addEventListener('mousedown', this.onDragStart.bind(scrollable), { passive: true });
-  window.addEventListener('mousemove', this.onDrag.bind(scrollable));
-  window.addEventListener('mouseup', this.onDragEnd.bind(scrollable), { passive: true });
-
-  scrollable.thumb.addEventListener('touchstart', this.onDragStart.bind(scrollable), { passive: true });
-  window.addEventListener('touchmove', this.onDrag.bind(scrollable));
-  window.addEventListener('touchend', this.onDragEnd.bind(scrollable), { passive: true });
-
-  requestAnimationFrame(fn);
-  window.addEventListener('resize', fn);
-
-  return fn
 };
 
 export default TrickScrollbar;

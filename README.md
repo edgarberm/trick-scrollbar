@@ -1,6 +1,6 @@
 <h1 align="center">trick-scrollbar</h1>
 
-<p align="center">The native browser's scrollbar customized with some magic tricks<p>
+<p align="center">The native browser's scrollbar customized with some magic tricks ✨<p>
 <p align="center">
   <img src="https://travis-ci.org/builtbyedgar/trick-scrollbar.svg?branch=master" alt="Build">
   <img src="https://img.shields.io/badge/license-MIT-green.svg" alt="License">
@@ -14,7 +14,7 @@ ________
 customized with some magic tricks.
 
 * It's native, it's efficient.
-* Use plain `scrollTo`, `scrollTop` and all js methods.
+* You can use plain JavaScript `scrollTo`, `scrollTop` and all native methods.
 * Is fully customizable.
 * Easy to use.
 * No dependencies.
@@ -28,16 +28,12 @@ Coming soon..
 
 First, don't set the CSS `overflow` as `hidden` because the scroll **won't work**.
 
-The container needs to have a `relative` position.
-
 ```html
 <style>
-  .scroll-container {
-    position: relative;
-    width: var(--width);
-    height: var(--height);
-    overflow-x: hidden;
-    overflow-y: scroll;
+  .scroll {
+    height: 100%;
+    width: 100%;
+    overflow: auto;
   }
 </style>
 ```
@@ -63,8 +59,8 @@ Import in browser:
 Initialise:
 
 ```js
-const wrapper = document.querySelector('.wrapper')
-const scroller = new TrickScrollbar(wrapper)
+const scrollContainer = document.querySelector('.scroll')
+const scroller = new TrickScrollbar(scrollContainer)
 ```
 
 ## License
@@ -75,7 +71,7 @@ const scroller = new TrickScrollbar(wrapper)
 ## TODO
 
 - [ ] Add support to horizontal scroll
-- [ ] Test in different browsers
+- [ ] Test in old browsers
 - [ ] Add CSS variables
 - [ ] Hide scrollbar when mouse is stopped
 - [ ] Finish the doc

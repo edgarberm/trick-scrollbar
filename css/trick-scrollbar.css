@@ -16,11 +16,19 @@
 }
 
 .ts-scroller {
+  -webkit-overflow-scrolling: touch;
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
 
-.ts-scroller::-webkit-scrollbar {
+.ts-scroller::-webkit-scrollbar,
+.ts-scroller::-webkit-scrollbar-thumb,
+.ts-scroller::-webkit-scrollbar-button,
+.ts-scroller::-webkit-scrollbar-track,
+.ts-scroller::-webkit-scrollbar-track-piece,
+.ts-scroller::-webkit-scrollbar-thumb,
+.ts-scroller::-webkit-scrollbar-corner,
+.ts-scroller::-webkit-resizer {
   display: none;
   width: 0;
   height: 0;

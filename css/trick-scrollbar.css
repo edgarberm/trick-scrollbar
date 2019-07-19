@@ -38,7 +38,6 @@
 .ts-scroller::-webkit-scrollbar-button,
 .ts-scroller::-webkit-scrollbar-track,
 .ts-scroller::-webkit-scrollbar-track-piece,
-.ts-scroller::-webkit-scrollbar-thumb,
 .ts-scroller::-webkit-scrollbar-corner,
 .ts-scroller::-webkit-resizer {
   display: none !important;

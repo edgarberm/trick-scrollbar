@@ -1,4 +1,16 @@
 
+:root {
+  --ts-scrollbar-width: 10px;
+  --ts-scrollbar-background-color: rgba(0, 0, 0, 0.05);
+  --ts-scrollbar-transition-time: 0.25s;
+  --ts-scrollbar-thumb-background-right: 2px;
+  --ts-scrollbar-thumb-background-width: 6px;
+  --ts-scrollbar-thumb-background-min-height: 20px;
+  --ts-scrollbar-thumb-background-border-radius: 3px;
+  --ts-scrollbar-thumb-background-color: rgba(0, 0, 0, 0.2);
+  --ts-scrollbar-thumb-background-hover: rgba(0, 0, 0, 0.3);
+}
+
 .ts-scroll-content {
   position: relative;
   width: 100%;
@@ -40,24 +52,24 @@
   top: 0;
   right: 0;
   height: 100%;
-  width: 10px;
-  background-color: rgba(0, 0, 0, 0.05);
+  width: var(--ts-scrollbar-width);
+  background-color: var(--ts-scrollbar-background-color);
   opacity: 0;
-  transition: opacity 0.25s ease 0.25s, background-color 0.25s ease;
+  transition: opacity var(--ts-scrollbar-transition-time) ease var(--ts-scrollbar-transition-time), 
+              background-color var(--ts-scrollbar-transition-time) ease;
 }
 
 .ts-thumb {
   position: absolute;
   top: 0;
-  right: 2px;
-  width: 6px;
-  height: 200px;
-  min-height: 20px;
-  border-radius: 3px;
-  background-color: rgba(0, 0, 0, 0.2);
+  right: var(--ts-scrollbar-thumb-background-right);
+  width: var(--ts-scrollbar-thumb-background-width);
+  min-height: var(--ts-scrollbar-thumb-background-min-height);
+  border-radius: var(--ts-scrollbar-thumb-background-border-radius);
+  background-color: var(--ts-scrollbar-thumb-background-color);
   transform-origin: top right;
   pointer-events: all;
-  transition: background-color 0.25s ease;
+  transition: background-color var(--ts-scrollbar-transition-time) ease;
   z-index: 9;
 }
 
@@ -68,5 +80,5 @@
 
 .ts-thumb:hover,
 .ts-scroll-content.dragging .ts-thumb {
-  background-color: rgba(0, 0, 0, 0.3);
+  background-color: var(--ts-scrollbar-thumb-background-hover);
 }

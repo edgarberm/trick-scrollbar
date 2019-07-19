@@ -27,7 +27,8 @@
     "build": "npm run clean && node build",
     "clean": "rm -rf dist",
     "watch": "npm run build && SHELL=/bin/bash chokidar 'src/*.js' -c 'npm run format && npm run build'",
-    "format": "prettier --write --single-quote --no-semi es5 'dist/*.js'"
+    "format": "prettier --write --single-quote --no-semi es5 'dist/*.js'",
+    "test": "jest"
   },
   "dependencies": {
     "chokidar-cli": "^1.2.0",
@@ -36,5 +37,11 @@
     "rollup": "^0.50.0",
     "rollup-plugin-buble": "^0.16.0",
     "uglify-js": "^3.1.2  "
+  },
+  "devDependencies": {
+    "@babel/core": "^7.5.5",
+    "@babel/preset-env": "^7.5.5",
+    "babel-jest": "^24.8.0",
+    "jest": "^24.8.0"
   }
 }

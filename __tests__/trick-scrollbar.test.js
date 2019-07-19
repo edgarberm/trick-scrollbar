@@ -18,7 +18,7 @@ describe('TrickScrollbar', () => {
   
   it('Check if the class constructor is called', () => {
     const scroller = document.querySelector('.scroll')
-    const trickScrollbar = new TrickScrollbar(scroller)
+    const trickScrollbar = new TrickScrollbar(scroller) 
     expect(TrickScrollbar).toHaveBeenCalledTimes(1)
     expect(TrickScrollbar).toHaveBeenCalledWith(scroller)
   })

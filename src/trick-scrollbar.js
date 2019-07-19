@@ -6,6 +6,7 @@ export default class TrickScrollbar {
     this.wrapper
     this.scrollbar
     this.thumb
+    this.lastX
     this.lastY
     this.dragging = false
 
@@ -15,7 +16,9 @@ export default class TrickScrollbar {
   }
 
   handleScroll () {
+    this.lastX = (this.scroller.scrollLeft / this.scroller.scrollWidth) * 100
     this.lastY = (this.scroller.scrollTop / this.scroller.scrollHeight) * 100
+
 
     window.requestAnimationFrame(() => {
       this.moveScrollbar(this.lastY)

@@ -9,6 +9,7 @@ var TrickScrollbar = function TrickScrollbar (element) {
   this.wrapper;
   this.scrollbar;
   this.thumb;
+  this.lastX;
   this.lastY;
   this.dragging = false;
 
@@ -20,7 +21,9 @@ var TrickScrollbar = function TrickScrollbar (element) {
 TrickScrollbar.prototype.handleScroll = function handleScroll () {
     var this$1 = this;
 
+  this.lastX = (this.scroller.scrollLeft / this.scroller.scrollWidth) * 100;
   this.lastY = (this.scroller.scrollTop / this.scroller.scrollHeight) * 100;
+
 
   window.requestAnimationFrame(function () {
     this$1.moveScrollbar(this$1.lastY);

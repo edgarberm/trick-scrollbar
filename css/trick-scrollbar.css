@@ -17,8 +17,8 @@
 
 .ts-scroller {
   -webkit-overflow-scrolling: touch;
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
 }
 
 .ts-scroller::-webkit-scrollbar,
@@ -29,9 +29,10 @@
 .ts-scroller::-webkit-scrollbar-thumb,
 .ts-scroller::-webkit-scrollbar-corner,
 .ts-scroller::-webkit-resizer {
-  display: none;
-  width: 0;
-  height: 0;
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  opacity: 0 !important;
 }
 
 .ts-scrollbar {
@@ -51,7 +52,7 @@
   right: 2px;
   width: 6px;
   height: 200px;
-  min-height: 60px;
+  min-height: 20px;
   border-radius: 3px;
   background-color: rgba(0, 0, 0, 0.2);
   transform-origin: top right;

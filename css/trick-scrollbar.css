@@ -22,9 +22,10 @@
   user-select: auto;
 }
 
-.ts-scroll-content.dragging {
+.ts-scroll-content.dragging .ts-scroller {
   pointer-events: none;
   user-select: none;
+  -webkit-user-select: none;
 }
 
 .ts-scroller {

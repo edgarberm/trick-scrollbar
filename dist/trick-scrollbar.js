@@ -35,7 +35,7 @@ TrickScrollbar.prototype.moveScrollbar = function moveScrollbar (newY) {
   this.thumb.style.top = newY + "%";
 };
 
-TrickScrollbar.prototype.onResize = function onResize () {
+TrickScrollbar.prototype.resize = function resize () {
   this.resizeScrollbar();
 };
 
@@ -43,6 +43,12 @@ TrickScrollbar.prototype.resizeScrollbar = function resizeScrollbar () {
   var percent = this.wrapper.offsetHeight / this.scroller.scrollHeight;
   var height = this.wrapper.offsetHeight * percent;
   this.thumb.style.height = height + "px";
+    
+  if (this.scroller.scrollHeight <= this.wrapper.offsetHeight) {
+    this.scrollbar.style.display ='none';
+  } else {
+    this.scrollbar.style.display ='inherit';
+  }
 };
   
 TrickScrollbar.prototype.onThumbMouseDown = function onThumbMouseDown () {
@@ -129,7 +135,7 @@ TrickScrollbar.prototype.addEventListeners = function addEventListeners () {
     
   this.scrollbar.addEventListener('click', this.onScrollbarClick.bind(this));
 
-  window.addEventListener('resize', debounce(this.onResize.bind(this), 250), false);
+  window.addEventListener('resize', debounce(this.resize.bind(this), 250), false);
 };
 
 /**

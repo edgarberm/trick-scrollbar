@@ -7,58 +7,62 @@ export default class TrickScrollbar {
     this.scrollbarY
     this.thumbY
     this.thumbX
-    this.lastX
-    this.lastY
     this.childrenWidth = 0
     this.dragging = false
 
     this.assembleDOM()
     this.chechChildrenWidth()
-    this.appendThumbY()
     this.appendThumbX()
-    this.resizeScrollbar()
+    this.appendThumbY()
+    this.resizeScrollbarX()
+    this.resizeScrollbarY()
     this.addEventListeners()
   }
 
   handleScroll () {
-    this.lastX = (this.scroller.scrollLeft / this.scroller.scrollWidth) * 100
-    this.lastY = (this.scroller.scrollTop / this.scroller.scrollHeight) * 100
+    const lastX = (this.scroller.scrollLeft / this.scroller.scrollWidth) * 100
+    const lastY = (this.scroller.scrollTop / this.scroller.scrollHeight) * 100
 
     window.requestAnimationFrame(() => {
-      this.moveScrollbar(this.lastX, this.lastY)
+      this.thumbX && this.moveScrollbarX(lastX)
+      this.thumbY && this.moveScrollbarY(lastY)
     })
   }
 
-  moveScrollbar (newX, newY) {
-    if (this.thumbX) {
-      this.thumbX.style.left = `${newX}%`;
-    }
+  moveScrollbarX (newX) {
+    this.thumbX.style.left = `${newX}%`;
+  }
+  
+  moveScrollbarY (newY) {
     this.thumbY.style.top = `${newY}%`;
   }
 
   resize () {
-    this.resizeScrollbar()
+    this.thumbX && this.resizeScrollbarX()
+    this.thumbY && this.resizeScrollbarY()
   }
 
-  resizeScrollbar () {
+  resizeScrollbarX () {
     const percentWidth = this.wrapper.offsetWidth / this.scroller.scrollWidth
     const width = this.wrapper.offsetWidth * percentWidth
+    this.thumbX.style.width = `${width}px`
 
-    const percentHeight = this.wrapper.offsetHeight / this.scroller.scrollHeight
-    const height = this.wrapper.offsetHeight * percentHeight
-    console.log(width)
-    
-    if (this.thumbX) {
-      this.thumbX.style.width = `${width}px`
-    }
-    this.thumbY.style.height = `${height}px`
-    
-    if (this.scroller.scrollHeight <= this.wrapper.offsetHeight) {
-      this.scrollbarY.style.display ='none'
-    } else if (this.childrenWidth <= this.scroller.offsetWidth && this.scrollbarX) {
+    if (this.childrenWidth <= this.scroller.offsetWidth && this.scrollbarX) {
       this.scrollbarX.style.display ='none'
     } else {
-      this.scrollbarY.style.display ='inherit'
+      this.scrollbarX.style.display ='inherit'
+    }
+  }
+  
+  resizeScrollbarY () {
+    const percentHeight = this.wrapper.offsetHeight / this.scroller.scrollHeight
+    const height = this.wrapper.offsetHeight * percentHeight
+    this.thumbY.style.height = `${height}px`
+
+    if (this.scroller.scrollHeight <= this.wrapper.offsetHeight) {
+      this.scrollbarY.style.display = 'none'
+    } else {
+      this.scrollbarY.style.display = 'inherit'
     }
   }
   

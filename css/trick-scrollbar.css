@@ -1,7 +1,8 @@
 
 :root {
   --ts-scrollbar-width: 10px;
-  --ts-scrollbar-background-color: rgba(0, 0, 0, 0.05);
+  --ts-scrollbar-background-color: rgba(0, 0, 0, 0);
+  --ts-scrollbar-background-color-hover: rgba(0, 0, 0, 0.06);
   --ts-scrollbar-transition-time: 0.25s;
   --ts-scrollbar-thumb-x-background-bottom: 2px;
   --ts-scrollbar-thumb-x-background-height: 6px;
@@ -103,10 +104,13 @@
 }
 
 .ts-scroll-content:hover .ts-scrollbar-x,
-.ts-scroll-content:hover .ts-scrollbar-y,
-.ts-scroll-content.dragging .ts-scrollbar-x,
-.ts-scroll-content.dragging .ts-scrollbar-y {
+.ts-scroll-content:hover .ts-scrollbar-y {
   opacity: 1;
+}
+
+.ts-scrollbar-x:hover,
+.ts-scrollbar-y:hover {
+  background-color: var(--ts-scrollbar-background-color-hover);
 }
 
 .ts-thumb-y:hover,

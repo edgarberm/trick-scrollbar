@@ -136,7 +136,30 @@ TrickScrollbar.prototype.onThumbDragStop = function onThumbDragStop () {
   window.removeEventListener('mousemove', this.onThumbYDragStart.bind(this));
 };
 
-TrickScrollbar.prototype.onScrollbarClick = function onScrollbarClick (event) {
+TrickScrollbar.prototype.onScrollbarXClick = function onScrollbarXClick (event) {
+    var this$1 = this;
+
+  var thumbWidth = parseFloat(this.thumbX.style.width.slice(0, -2));
+  var correctedX = event.clientX - (thumbWidth / 2);
+  var perc = correctedX / this.scroller.offsetWidth;
+  var posX = this.scroller.scrollWidth * perc;
+  var diff = posX - this.scroller.scrollLeft;
+  var interval = diff / 12;
+  var x = 0;
+
+  var repeat = function () {
+    setTimeout(function () {
+      this$1.scroller.scrollLeft += interval;
+      x += 1;
+
+      if (x < 12) { repeat(); }
+    }, 16);
+  };
+
+  repeat();
+};
+
+TrickScrollbar.prototype.onScrollbarYClick = function onScrollbarYClick (event) {
     var this$1 = this;
 
   var thumbHeight = parseFloat(this.thumbY.style.height.slice(0, -2));
@@ -214,7 +237,8 @@ TrickScrollbar.prototype.addEventListeners = function addEventListeners () {
   this.thumbY && this.thumbY.addEventListener('touchstart', this.onThumbYMouseDown.bind(this));
   window.addEventListener('touchend', this.onThumbDragStop.bind(this));
     
-  this.scrollbarY.addEventListener('click', this.onScrollbarClick.bind(this));
+  this.scrollbarX && this.scrollbarX.addEventListener('click', this.onScrollbarXClick.bind(this));
+  this.scrollbarY && this.scrollbarY.addEventListener('click', this.onScrollbarYClick.bind(this));
 
   window.addEventListener('resize', debounce(this.resize.bind(this), 250), false);
 };

@@ -127,7 +127,28 @@ export default class TrickScrollbar {
     window.removeEventListener('mousemove', this.onThumbYDragStart.bind(this))
   }
 
-  onScrollbarClick (event) {
+  onScrollbarXClick (event) {
+    const thumbWidth = parseFloat(this.thumbX.style.width.slice(0, -2))
+    const correctedX = event.clientX - (thumbWidth / 2)
+    const perc = correctedX / this.scroller.offsetWidth
+    const posX = this.scroller.scrollWidth * perc
+    const diff = posX - this.scroller.scrollLeft
+    const interval = diff / 12
+    let x = 0
+
+    const repeat = () => {
+      setTimeout(() => {
+        this.scroller.scrollLeft += interval
+        x += 1
+
+        if (x < 12) repeat()
+      }, 16)
+    }
+
+    repeat()
+  }
+
+  onScrollbarYClick (event) {
     const thumbHeight = parseFloat(this.thumbY.style.height.slice(0, -2))
     const correctedY = event.clientY - (thumbHeight / 2)
     const perc = correctedY / this.scroller.offsetHeight
@@ -201,7 +222,8 @@ export default class TrickScrollbar {
     this.thumbY && this.thumbY.addEventListener('touchstart', this.onThumbYMouseDown.bind(this))
     window.addEventListener('touchend', this.onThumbDragStop.bind(this))
     
-    this.scrollbarY.addEventListener('click', this.onScrollbarClick.bind(this))
+    this.scrollbarX && this.scrollbarX.addEventListener('click', this.onScrollbarXClick.bind(this))
+    this.scrollbarY && this.scrollbarY.addEventListener('click', this.onScrollbarYClick.bind(this))
 
     window.addEventListener('resize', debounce(this.resize.bind(this), 250), false)
   }

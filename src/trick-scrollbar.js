@@ -4,8 +4,9 @@ export default class TrickScrollbar {
   constructor (element) {
     this.scroller = element
     this.wrapper
-    this.scrollbar
-    this.thumb
+    this.scrollbarY
+    this.thumbY
+    this.thumbX
     this.lastX
     this.lastY
     this.dragging = false
@@ -26,7 +27,7 @@ export default class TrickScrollbar {
   }
 
   moveScrollbar (newY) {
-    this.thumb.style.top = `${newY}%`;
+    this.thumbY.style.top = `${newY}%`;
   }
 
   resize () {
@@ -34,14 +35,19 @@ export default class TrickScrollbar {
   }
 
   resizeScrollbar () {
-    const percent = this.wrapper.offsetHeight / this.scroller.scrollHeight
-    const height = this.wrapper.offsetHeight * percent
-    this.thumb.style.height = `${height}px`
+    const percentWidth = this.wrapper.offsetWidth / this.scroller.scrollWidth
+    const width = this.wrapper.offsetHeight * percentWidth
+    const percentHeight = this.wrapper.offsetHeight / this.scroller.scrollHeight
+    const height = this.wrapper.offsetHeight * percentHeight
+    this.thumbX.style.width = `${width}px`
+    this.thumbY.style.height = `${height}px`
     
     if (this.scroller.scrollHeight <= this.wrapper.offsetHeight) {
-      this.scrollbar.style.display ='none'
+      this.scrollbarX.style.display ='none'
+      this.scrollbarY.style.display ='none'
     } else {
-      this.scrollbar.style.display ='inherit'
+      this.scrollbarX.style.display ='inherit'
+      this.scrollbarY.style.display ='inherit'
     }
   }
   
@@ -49,7 +55,7 @@ export default class TrickScrollbar {
     this.dragging = true
     this.wrapper.classList.add('dragging')
 
-    const top = this.thumb.style.top ? this.thumb.style.top : '0%'
+    const top = this.thumbY.style.top ? this.thumbY.style.top : '0%'
     const perc = parseFloat(top.slice(0, -1)) / 100
     const posY = this.wrapper.offsetHeight * perc
     const clientY =
@@ -79,7 +85,7 @@ export default class TrickScrollbar {
   }
 
   onScrollbarClick (event) {
-    const thumbHeight = parseFloat(this.thumb.style.height.slice(0, -2))
+    const thumbHeight = parseFloat(this.thumbY.style.height.slice(0, -2))
     const correctedY = event.clientY - (thumbHeight / 2)
     const perc = correctedY / this.scroller.offsetHeight
     const posY = this.scroller.scrollHeight * perc
@@ -102,30 +108,53 @@ export default class TrickScrollbar {
   assembleDOM () {
     const parent = this.scroller.parentNode
     this.wrapper = document.createElement('div')
-    this.scrollbar = document.createElement('div')
-    this.thumb = document.createElement('div')
-
+    this.scrollbarY = document.createElement('div')
+    this.thumbY = document.createElement('div')
+    
     this.wrapper.classList.add('ts-scroll-content')
     this.scroller.classList.add('ts-scroller')
-    this.scrollbar.classList.add('ts-scrollbar')
-    this.thumb.classList.add('ts-thumb')
+    this.scrollbarY.classList.add('ts-scrollbar-y')
+    this.thumbY.classList.add('ts-thumb-y')
 
     parent.appendChild(this.wrapper)
     this.wrapper.appendChild(this.scroller)
-    this.scrollbar.appendChild(this.thumb)
-    this.wrapper.appendChild(this.scrollbar)
+    this.scrollbarY.appendChild(this.thumbY)
+    this.wrapper.appendChild(this.scrollbarY)
+
+    if (this.chechChildrenWidth() > this.scroller.offsetWidth) {
+      this.scrollbarX = document.createElement('div')
+      this.scrollbarX.classList.add('ts-scrollbar-x')
+      this.thumbX = document.createElement('div')
+      this.thumbX.classList.add('ts-thumb-x')
+      this.scrollbarX.appendChild(this.thumbX)
+      this.wrapper.appendChild(this.scrollbarX)
+
+      console.log('Needs horizontal scroll');
+    }
+  }
+
+  // TODO: refactor
+  chechChildrenWidth () {
+    let childrenWidth = 0
+    Array.from(this.scroller.children).forEach(child => {
+      if (childrenWidth <= child.offsetWidth) {
+        childrenWidth = child.offsetWidth
+      }
+    })
+
+    return childrenWidth
   }
 
   addEventListeners () {
     this.scroller.addEventListener('scroll', this.handleScroll.bind(this))
 
-    this.thumb.addEventListener('mousedown', this.onThumbMouseDown.bind(this))
+    this.thumbY.addEventListener('mousedown', this.onThumbMouseDown.bind(this))
     window.addEventListener('mouseup', this.onThumbDragStop.bind(this))
     
-    this.thumb.addEventListener('touchstart', this.onThumbMouseDown.bind(this))
+    this.thumbY.addEventListener('touchstart', this.onThumbMouseDown.bind(this))
     window.addEventListener('touchend', this.onThumbDragStop.bind(this))
     
-    this.scrollbar.addEventListener('click', this.onScrollbarClick.bind(this))
+    this.scrollbarY.addEventListener('click', this.onScrollbarClick.bind(this))
 
     window.addEventListener('resize', debounce(this.resize.bind(this), 250), false)
   }

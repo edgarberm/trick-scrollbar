@@ -3,9 +3,12 @@
   --ts-scrollbar-width: 10px;
   --ts-scrollbar-background-color: rgba(0, 0, 0, 0.05);
   --ts-scrollbar-transition-time: 0.25s;
-  --ts-scrollbar-thumb-background-right: 2px;
-  --ts-scrollbar-thumb-background-width: 6px;
-  --ts-scrollbar-thumb-background-min-height: 20px;
+  --ts-scrollbar-thumb-x-background-bottom: 2px;
+  --ts-scrollbar-thumb-x-background-height: 6px;
+  --ts-scrollbar-thumb-x-background-min-width: 20px;
+  --ts-scrollbar-thumb-y-background-right: 2px;
+  --ts-scrollbar-thumb-y-background-width: 6px;
+  --ts-scrollbar-thumb-y-background-min-height: 20px;
   --ts-scrollbar-thumb-background-border-radius: 3px;
   --ts-scrollbar-thumb-background-color: rgba(0, 0, 0, 0.2);
   --ts-scrollbar-thumb-background-hover: rgba(0, 0, 0, 0.3);
@@ -47,24 +50,36 @@
   opacity: 0 !important;
 }
 
-.ts-scrollbar {
+.ts-scrollbar-x {
   position: fixed;
-  top: 0;
-  right: 0;
-  height: 100%;
-  width: var(--ts-scrollbar-width);
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: var(--ts-scrollbar-width);
   background-color: var(--ts-scrollbar-background-color);
   opacity: 0;
   transition: opacity var(--ts-scrollbar-transition-time) ease var(--ts-scrollbar-transition-time), 
               background-color var(--ts-scrollbar-transition-time) ease;
 }
 
-.ts-thumb {
-  position: absolute;
+.ts-scrollbar-y {
+  position: fixed;
   top: 0;
-  right: var(--ts-scrollbar-thumb-background-right);
-  width: var(--ts-scrollbar-thumb-background-width);
-  min-height: var(--ts-scrollbar-thumb-background-min-height);
+  right: 0;
+  width: var(--ts-scrollbar-width);
+  height: 100%;
+  background-color: var(--ts-scrollbar-background-color);
+  opacity: 0;
+  transition: opacity var(--ts-scrollbar-transition-time) ease var(--ts-scrollbar-transition-time), 
+              background-color var(--ts-scrollbar-transition-time) ease;
+}
+
+.ts-thumb-x {
+  position: absolute;
+  bottom: var(--ts-scrollbar-thumb-x-background-bottom);
+  left: 0;
+  height: var(--ts-scrollbar-thumb-x-background-height);
+  min-height: var(--ts-scrollbar-thumb-x-background-height);
   border-radius: var(--ts-scrollbar-thumb-background-border-radius);
   background-color: var(--ts-scrollbar-thumb-background-color);
   transform-origin: top right;
@@ -73,12 +88,28 @@
   z-index: 9;
 }
 
-.ts-scroll-content:hover .ts-scrollbar,
-.ts-scroll-content.dragging .ts-scrollbar {
+.ts-thumb-y {
+  position: absolute;
+  top: 0;
+  right: var(--ts-scrollbar-thumb-y-background-right);
+  width: var(--ts-scrollbar-thumb-y-background-width);
+  min-width: var(--ts-scrollbar-thumb-y-background-min-width);
+  border-radius: var(--ts-scrollbar-thumb-background-border-radius);
+  background-color: var(--ts-scrollbar-thumb-background-color);
+  transform-origin: top right;
+  pointer-events: all;
+  transition: background-color var(--ts-scrollbar-transition-time) ease;
+  z-index: 9;
+}
+
+.ts-scroll-content:hover .ts-scrollbar-x,
+.ts-scroll-content:hover .ts-scrollbar-y,
+.ts-scroll-content.dragging .ts-scrollbar-x,
+.ts-scroll-content.dragging .ts-scrollbar-y {
   opacity: 1;
 }
 
-.ts-thumb:hover,
-.ts-scroll-content.dragging .ts-thumb {
+.ts-thumb-y:hover,
+.ts-scroll-content.dragging .ts-thumb-y {
   background-color: var(--ts-scrollbar-thumb-background-hover);
 }

@@ -16,9 +16,13 @@ var TrickScrollbar = function TrickScrollbar (element) {
   this.thumbX;
   this.lastX;
   this.lastY;
+  this.childrenWidth = 0;
   this.dragging = false;
 
   this.assembleDOM();
+  this.chechChildrenWidth();
+  this.appendThumbY();
+  this.appendThumbX();
   this.resizeScrollbar();
   this.addEventListeners();
 };
@@ -29,13 +33,15 @@ TrickScrollbar.prototype.handleScroll = function handleScroll () {
   this.lastX = (this.scroller.scrollLeft / this.scroller.scrollWidth) * 100;
   this.lastY = (this.scroller.scrollTop / this.scroller.scrollHeight) * 100;
 
-
   window.requestAnimationFrame(function () {
-    this$1.moveScrollbar(this$1.lastY);
+    this$1.moveScrollbar(this$1.lastX, this$1.lastY);
   });
 };
 
-TrickScrollbar.prototype.moveScrollbar = function moveScrollbar (newY) {
+TrickScrollbar.prototype.moveScrollbar = function moveScrollbar (newX, newY) {
+  if (this.thumbX) {
+    this.thumbX.style.left = newX + "%";
+  }
   this.thumbY.style.top = newY + "%";
 };
 
@@ -45,17 +51,22 @@ TrickScrollbar.prototype.resize = function resize () {
 
 TrickScrollbar.prototype.resizeScrollbar = function resizeScrollbar () {
   var percentWidth = this.wrapper.offsetWidth / this.scroller.scrollWidth;
-  var width = this.wrapper.offsetHeight * percentWidth;
+  var width = this.wrapper.offsetWidth * percentWidth;
+
   var percentHeight = this.wrapper.offsetHeight / this.scroller.scrollHeight;
   var height = this.wrapper.offsetHeight * percentHeight;
-  this.thumbX.style.width = width + "px";
+  console.log(width);
+    
+  if (this.thumbX) {
+    this.thumbX.style.width = width + "px";
+  }
   this.thumbY.style.height = height + "px";
     
   if (this.scroller.scrollHeight <= this.wrapper.offsetHeight) {
-    this.scrollbarX.style.display ='none';
     this.scrollbarY.style.display ='none';
+  } else if (this.childrenWidth <= this.scroller.offsetWidth && this.scrollbarX) {
+    this.scrollbarX.style.display ='none';
   } else {
-    this.scrollbarX.style.display ='inherit';
     this.scrollbarY.style.display ='inherit';
   }
 };
@@ -119,41 +130,45 @@ TrickScrollbar.prototype.onScrollbarClick = function onScrollbarClick (event) {
 TrickScrollbar.prototype.assembleDOM = function assembleDOM () {
   var parent = this.scroller.parentNode;
   this.wrapper = document.createElement('div');
-  this.scrollbarY = document.createElement('div');
-  this.thumbY = document.createElement('div');
     
   this.wrapper.classList.add('ts-scroll-content');
   this.scroller.classList.add('ts-scroller');
-  this.scrollbarY.classList.add('ts-scrollbar-y');
-  this.thumbY.classList.add('ts-thumb-y');
-
+    
   parent.appendChild(this.wrapper);
   this.wrapper.appendChild(this.scroller);
+};
+  
+TrickScrollbar.prototype.appendThumbY = function appendThumbY () {
+  this.scrollbarY = document.createElement('div');
+  this.thumbY = document.createElement('div');
+    
+  this.scrollbarY.classList.add('ts-scrollbar-y');
+  this.thumbY.classList.add('ts-thumb-y');
+    
   this.scrollbarY.appendChild(this.thumbY);
   this.wrapper.appendChild(this.scrollbarY);
+};
 
-  if (this.chechChildrenWidth() > this.scroller.offsetWidth) {
+TrickScrollbar.prototype.appendThumbX = function appendThumbX () {
+  if (this.childrenWidth > this.scroller.offsetWidth) {
     this.scrollbarX = document.createElement('div');
     this.scrollbarX.classList.add('ts-scrollbar-x');
     this.thumbX = document.createElement('div');
     this.thumbX.classList.add('ts-thumb-x');
     this.scrollbarX.appendChild(this.thumbX);
     this.wrapper.appendChild(this.scrollbarX);
-
-    console.log('Needs horizontal scroll');
   }
 };
 
 // TODO: refactor
 TrickScrollbar.prototype.chechChildrenWidth = function chechChildrenWidth () {
-  var childrenWidth = 0;
+    var this$1 = this;
+
   Array.from(this.scroller.children).forEach(function (child) {
-    if (childrenWidth <= child.offsetWidth) {
-      childrenWidth = child.offsetWidth;
+    if (this$1.childrenWidth <= child.offsetWidth) {
+      this$1.childrenWidth = child.offsetWidth;
     }
   });
-
-  return childrenWidth
 };
 
 TrickScrollbar.prototype.addEventListeners = function addEventListeners () {

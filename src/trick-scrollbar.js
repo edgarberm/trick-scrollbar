@@ -9,9 +9,13 @@ export default class TrickScrollbar {
     this.thumbX
     this.lastX
     this.lastY
+    this.childrenWidth = 0
     this.dragging = false
 
     this.assembleDOM()
+    this.chechChildrenWidth()
+    this.appendThumbY()
+    this.appendThumbX()
     this.resizeScrollbar()
     this.addEventListeners()
   }
@@ -20,13 +24,15 @@ export default class TrickScrollbar {
     this.lastX = (this.scroller.scrollLeft / this.scroller.scrollWidth) * 100
     this.lastY = (this.scroller.scrollTop / this.scroller.scrollHeight) * 100
 
-
     window.requestAnimationFrame(() => {
-      this.moveScrollbar(this.lastY)
+      this.moveScrollbar(this.lastX, this.lastY)
     })
   }
 
-  moveScrollbar (newY) {
+  moveScrollbar (newX, newY) {
+    if (this.thumbX) {
+      this.thumbX.style.left = `${newX}%`;
+    }
     this.thumbY.style.top = `${newY}%`;
   }
 
@@ -36,17 +42,22 @@ export default class TrickScrollbar {
 
   resizeScrollbar () {
     const percentWidth = this.wrapper.offsetWidth / this.scroller.scrollWidth
-    const width = this.wrapper.offsetHeight * percentWidth
+    const width = this.wrapper.offsetWidth * percentWidth
+
     const percentHeight = this.wrapper.offsetHeight / this.scroller.scrollHeight
     const height = this.wrapper.offsetHeight * percentHeight
-    this.thumbX.style.width = `${width}px`
+    console.log(width)
+    
+    if (this.thumbX) {
+      this.thumbX.style.width = `${width}px`
+    }
     this.thumbY.style.height = `${height}px`
     
     if (this.scroller.scrollHeight <= this.wrapper.offsetHeight) {
-      this.scrollbarX.style.display ='none'
       this.scrollbarY.style.display ='none'
+    } else if (this.childrenWidth <= this.scroller.offsetWidth && this.scrollbarX) {
+      this.scrollbarX.style.display ='none'
     } else {
-      this.scrollbarX.style.display ='inherit'
       this.scrollbarY.style.display ='inherit'
     }
   }
@@ -108,41 +119,43 @@ export default class TrickScrollbar {
   assembleDOM () {
     const parent = this.scroller.parentNode
     this.wrapper = document.createElement('div')
-    this.scrollbarY = document.createElement('div')
-    this.thumbY = document.createElement('div')
     
     this.wrapper.classList.add('ts-scroll-content')
     this.scroller.classList.add('ts-scroller')
-    this.scrollbarY.classList.add('ts-scrollbar-y')
-    this.thumbY.classList.add('ts-thumb-y')
-
+    
     parent.appendChild(this.wrapper)
     this.wrapper.appendChild(this.scroller)
+  }
+  
+  appendThumbY () {
+    this.scrollbarY = document.createElement('div')
+    this.thumbY = document.createElement('div')
+    
+    this.scrollbarY.classList.add('ts-scrollbar-y')
+    this.thumbY.classList.add('ts-thumb-y')
+    
     this.scrollbarY.appendChild(this.thumbY)
     this.wrapper.appendChild(this.scrollbarY)
+  }
 
-    if (this.chechChildrenWidth() > this.scroller.offsetWidth) {
+  appendThumbX () {
+    if (this.childrenWidth > this.scroller.offsetWidth) {
       this.scrollbarX = document.createElement('div')
       this.scrollbarX.classList.add('ts-scrollbar-x')
       this.thumbX = document.createElement('div')
       this.thumbX.classList.add('ts-thumb-x')
       this.scrollbarX.appendChild(this.thumbX)
       this.wrapper.appendChild(this.scrollbarX)
-
-      console.log('Needs horizontal scroll');
     }
   }
 
   // TODO: refactor
   chechChildrenWidth () {
-    let childrenWidth = 0
     Array.from(this.scroller.children).forEach(child => {
-      if (childrenWidth <= child.offsetWidth) {
-        childrenWidth = child.offsetWidth
+      if (this.childrenWidth <= child.offsetWidth) {
+        this.childrenWidth = child.offsetWidth
       }
     })
-
-    return childrenWidth
   }
 
   addEventListeners () {

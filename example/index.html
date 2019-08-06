@@ -45,7 +45,7 @@
 
     p {
       font-size: 14px;
-      margin-bottom: 30%;
+      margin-bottom: 100px;
     }
   </style>
 </head>
@@ -112,12 +112,12 @@
       const textnode = document.createTextNode(text)
       const node = document.createElement('p')
       node.appendChild(textnode)
-      document.querySelector('.section').appendChild(node)
+      document.querySelector('section').appendChild(node)
       scroller.resize()
     })
     
     document.querySelector('.remove').addEventListener('click', () => {
-      document.querySelector('.section').removeChild(document.querySelector('.section').lastChild)
+      document.querySelector('section').removeChild(document.querySelector('section').lastChild)
       scroller.resize()
     })
 

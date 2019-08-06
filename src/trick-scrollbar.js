@@ -65,8 +65,27 @@ export default class TrickScrollbar {
       this.scrollbarY.style.display = 'inherit'
     }
   }
+
+  onThumbXMouseDown() {
+    this.dragging = true
+    this.wrapper.classList.add('dragging')
+
+    const left = this.thumbX.style.left ? this.thumbX.style.left : '0%'
+    const perc = parseFloat(left.slice(0, -1)) / 100
+    const posX = this.wrapper.offsetHeight * perc
+    const clientX =
+      event.clientX || event.clientX === 0
+        ? event.clientX
+        : event.touches[0].clientX
+    const offset = clientX - posX
+
+    window.addEventListener('mousemove', this.onThumbXDragStart.bind(this, offset))
+    window.addEventListener('touchmove', this.onThumbXDragStart.bind(this, offset))
+
+    event.stopPropagation()
+  }
   
-  onThumbMouseDown () {
+  onThumbYMouseDown () {
     this.dragging = true
     this.wrapper.classList.add('dragging')
 
@@ -79,13 +98,13 @@ export default class TrickScrollbar {
         : event.touches[0].clientY
     const offset = clientY - posY
 
-    window.addEventListener('mousemove', this.onThumbDragStart.bind(this, offset))
-    window.addEventListener('touchmove', this.onThumbDragStart.bind(this, offset))
+    window.addEventListener('mousemove', this.onThumbYDragStart.bind(this, offset))
+    window.addEventListener('touchmove', this.onThumbYDragStart.bind(this, offset))
 
     event.stopPropagation()
   }
 
-  onThumbDragStart (offset, event) {
+  onThumbYDragStart (offset, event) {
     if (this.dragging) {
       const perc = ((event.clientY - offset) / this.wrapper.offsetHeight)
       const posY = this.scroller.scrollHeight * perc
@@ -93,10 +112,19 @@ export default class TrickScrollbar {
     }
   }
 
+  onThumbXDragStart(offset, event) {
+    if (this.dragging) {
+      const perc = ((event.clientX - offset) / this.wrapper.offsetWidth)
+      const posX = this.scroller.scrollWidth * perc
+      this.scroller.scrollLeft = posX
+    }
+  }
+
   onThumbDragStop () {
     this.dragging = false
     this.wrapper.classList.remove('dragging')
-    window.removeEventListener('mousemove', this.onThumbDragStart.bind(this))
+    window.removeEventListener('mousemove', this.onThumbXDragStart.bind(this))
+    window.removeEventListener('mousemove', this.onThumbYDragStart.bind(this))
   }
 
   onScrollbarClick (event) {
@@ -165,10 +193,12 @@ export default class TrickScrollbar {
   addEventListeners () {
     this.scroller.addEventListener('scroll', this.handleScroll.bind(this))
 
-    this.thumbY.addEventListener('mousedown', this.onThumbMouseDown.bind(this))
+    this.thumbX && this.thumbX.addEventListener('mousedown', this.onThumbXMouseDown.bind(this))
+    this.thumbY && this.thumbY.addEventListener('mousedown', this.onThumbYMouseDown.bind(this))
     window.addEventListener('mouseup', this.onThumbDragStop.bind(this))
     
-    this.thumbY.addEventListener('touchstart', this.onThumbMouseDown.bind(this))
+    this.thumbX && this.thumbX.addEventListener('touchstart', this.onThumbXMouseDown.bind(this))
+    this.thumbY && this.thumbY.addEventListener('touchstart', this.onThumbYMouseDown.bind(this))
     window.addEventListener('touchend', this.onThumbDragStop.bind(this))
     
     this.scrollbarY.addEventListener('click', this.onScrollbarClick.bind(this))

@@ -74,8 +74,27 @@ TrickScrollbar.prototype.resizeScrollbarY = function resizeScrollbarY () {
     this.scrollbarY.style.display = 'inherit';
   }
 };
+
+TrickScrollbar.prototype.onThumbXMouseDown = function onThumbXMouseDown () {
+  this.dragging = true;
+  this.wrapper.classList.add('dragging');
+
+  var left = this.thumbX.style.left ? this.thumbX.style.left : '0%';
+  var perc = parseFloat(left.slice(0, -1)) / 100;
+  var posX = this.wrapper.offsetHeight * perc;
+  var clientX =
+    event.clientX || event.clientX === 0
+      ? event.clientX
+      : event.touches[0].clientX;
+  var offset = clientX - posX;
+
+  window.addEventListener('mousemove', this.onThumbXDragStart.bind(this, offset));
+  window.addEventListener('touchmove', this.onThumbXDragStart.bind(this, offset));
+
+  event.stopPropagation();
+};
   
-TrickScrollbar.prototype.onThumbMouseDown = function onThumbMouseDown () {
+TrickScrollbar.prototype.onThumbYMouseDown = function onThumbYMouseDown () {
   this.dragging = true;
   this.wrapper.classList.add('dragging');
 
@@ -88,13 +107,13 @@ TrickScrollbar.prototype.onThumbMouseDown = function onThumbMouseDown () {
       : event.touches[0].clientY;
   var offset = clientY - posY;
 
-  window.addEventListener('mousemove', this.onThumbDragStart.bind(this, offset));
-  window.addEventListener('touchmove', this.onThumbDragStart.bind(this, offset));
+  window.addEventListener('mousemove', this.onThumbYDragStart.bind(this, offset));
+  window.addEventListener('touchmove', this.onThumbYDragStart.bind(this, offset));
 
   event.stopPropagation();
 };
 
-TrickScrollbar.prototype.onThumbDragStart = function onThumbDragStart (offset, event) {
+TrickScrollbar.prototype.onThumbYDragStart = function onThumbYDragStart (offset, event) {
   if (this.dragging) {
     var perc = ((event.clientY - offset) / this.wrapper.offsetHeight);
     var posY = this.scroller.scrollHeight * perc;
@@ -102,10 +121,19 @@ TrickScrollbar.prototype.onThumbDragStart = function onThumbDragStart (offset, e
   }
 };
 
+TrickScrollbar.prototype.onThumbXDragStart = function onThumbXDragStart (offset, event) {
+  if (this.dragging) {
+    var perc = ((event.clientX - offset) / this.wrapper.offsetWidth);
+    var posX = this.scroller.scrollWidth * perc;
+    this.scroller.scrollLeft = posX;
+  }
+};
+
 TrickScrollbar.prototype.onThumbDragStop = function onThumbDragStop () {
   this.dragging = false;
   this.wrapper.classList.remove('dragging');
-  window.removeEventListener('mousemove', this.onThumbDragStart.bind(this));
+  window.removeEventListener('mousemove', this.onThumbXDragStart.bind(this));
+  window.removeEventListener('mousemove', this.onThumbYDragStart.bind(this));
 };
 
 TrickScrollbar.prototype.onScrollbarClick = function onScrollbarClick (event) {
@@ -178,10 +206,12 @@ TrickScrollbar.prototype.chechChildrenWidth = function chechChildrenWidth () {
 TrickScrollbar.prototype.addEventListeners = function addEventListeners () {
   this.scroller.addEventListener('scroll', this.handleScroll.bind(this));
 
-  this.thumbY.addEventListener('mousedown', this.onThumbMouseDown.bind(this));
+  this.thumbX && this.thumbX.addEventListener('mousedown', this.onThumbXMouseDown.bind(this));
+  this.thumbY && this.thumbY.addEventListener('mousedown', this.onThumbYMouseDown.bind(this));
   window.addEventListener('mouseup', this.onThumbDragStop.bind(this));
     
-  this.thumbY.addEventListener('touchstart', this.onThumbMouseDown.bind(this));
+  this.thumbX && this.thumbX.addEventListener('touchstart', this.onThumbXMouseDown.bind(this));
+  this.thumbY && this.thumbY.addEventListener('touchstart', this.onThumbYMouseDown.bind(this));
   window.addEventListener('touchend', this.onThumbDragStop.bind(this));
     
   this.scrollbarY.addEventListener('click', this.onScrollbarClick.bind(this));

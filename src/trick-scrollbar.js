@@ -8,7 +8,8 @@ export default class TrickScrollbar {
     this.thumbY
     this.thumbX
     this.childrenWidth = 0
-    this.dragging = false
+    this.draggingX = false
+    this.draggingY = false
 
     this.assembleDOM()
     this.chechChildrenWidth()
@@ -66,13 +67,16 @@ export default class TrickScrollbar {
     }
   }
 
-  onThumbXMouseDown() {
-    this.dragging = true
+  onThumbXMouseDown () {
+    this.draggingX = true
     this.wrapper.classList.add('dragging')
+    console.log('sisis');
+    console.log(this.thumbX.style.left);
+    
 
     const left = this.thumbX.style.left ? this.thumbX.style.left : '0%'
     const perc = parseFloat(left.slice(0, -1)) / 100
-    const posX = this.wrapper.offsetHeight * perc
+    const posX = this.wrapper.offsetWidth * perc
     const clientX =
       event.clientX || event.clientX === 0
         ? event.clientX
@@ -86,7 +90,7 @@ export default class TrickScrollbar {
   }
   
   onThumbYMouseDown () {
-    this.dragging = true
+    this.draggingY = true
     this.wrapper.classList.add('dragging')
 
     const top = this.thumbY.style.top ? this.thumbY.style.top : '0%'
@@ -104,24 +108,25 @@ export default class TrickScrollbar {
     event.stopPropagation()
   }
 
-  onThumbYDragStart (offset, event) {
-    if (this.dragging) {
-      const perc = ((event.clientY - offset) / this.wrapper.offsetHeight)
-      const posY = this.scroller.scrollHeight * perc
-      this.scroller.scrollTop = posY
-    }
-  }
-
   onThumbXDragStart(offset, event) {
-    if (this.dragging) {
+    if (this.draggingX) {
       const perc = ((event.clientX - offset) / this.wrapper.offsetWidth)
       const posX = this.scroller.scrollWidth * perc
       this.scroller.scrollLeft = posX
     }
   }
 
+  onThumbYDragStart (offset, event) {
+    if (this.draggingY) {
+      const perc = ((event.clientY - offset) / this.wrapper.offsetHeight)
+      const posY = this.scroller.scrollHeight * perc
+      this.scroller.scrollTop = posY
+    }
+  }
+
   onThumbDragStop () {
-    this.dragging = false
+    this.draggingX = false
+    this.draggingY = false
     this.wrapper.classList.remove('dragging')
     window.removeEventListener('mousemove', this.onThumbXDragStart.bind(this))
     window.removeEventListener('mousemove', this.onThumbYDragStart.bind(this))
@@ -134,18 +139,8 @@ export default class TrickScrollbar {
     const posX = this.scroller.scrollWidth * perc
     const diff = posX - this.scroller.scrollLeft
     const interval = diff / 12
-    let x = 0
 
-    const repeat = () => {
-      setTimeout(() => {
-        this.scroller.scrollLeft += interval
-        x += 1
-
-        if (x < 12) repeat()
-      }, 16)
-    }
-
-    repeat()
+    repeat(this.scroller, 'scrollLeft', interval)
   }
 
   onScrollbarYClick (event) {
@@ -155,18 +150,9 @@ export default class TrickScrollbar {
     const posY = this.scroller.scrollHeight * perc
     const diff = posY - this.scroller.scrollTop
     const interval = diff / 12
-    let x = 0
-
-    const repeat = () => {
-      setTimeout(() => {
-        this.scroller.scrollTop += interval
-        x += 1
-
-        if (x < 12) repeat()
-      }, 16)
-    }
-
-    repeat()
+    console.log(!!this.draggingY);
+    
+    repeat(this.scroller, 'scrollTop', interval)
   }
 
   assembleDOM () {
@@ -227,6 +213,15 @@ export default class TrickScrollbar {
 
     window.addEventListener('resize', debounce(this.resize.bind(this), 250), false)
   }
+}
+
+const repeat = (scroller, prop, interval, start = 0) => {
+  setTimeout(() => {
+    scroller[prop] += interval
+    start += 1
+
+    if (start < 12) repeat(scroller, prop, interval, start)
+  }, 16)
 }
 
 /**

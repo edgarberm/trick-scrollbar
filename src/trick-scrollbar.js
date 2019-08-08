@@ -39,6 +39,7 @@ export default class TrickScrollbar {
   }
 
   resize () {
+    this.handleScroll()
     this.thumbX && this.resizeScrollbarX()
     this.thumbY && this.resizeScrollbarY()
   }

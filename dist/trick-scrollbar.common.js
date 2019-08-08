@@ -44,6 +44,7 @@ TrickScrollbar.prototype.moveScrollbarY = function moveScrollbarY (newY) {
 };
 
 TrickScrollbar.prototype.resize = function resize () {
+  this.handleScroll();
   this.thumbX && this.resizeScrollbarX();
   this.thumbY && this.resizeScrollbarY();
 };

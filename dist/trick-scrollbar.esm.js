@@ -41,7 +41,7 @@ TrickScrollbar.prototype.moveScrollbarY = function moveScrollbarY (newY) {
   this.thumbY.style.top = newY + "%";
 };
 
-TrickScrollbar.prototype.resize = function resize () {
+TrickScrollbar.prototype.update = function update () {
   this.handleScroll();
   this.thumbX && this.resizeScrollbarX();
   this.thumbY && this.resizeScrollbarY();
@@ -187,7 +187,7 @@ TrickScrollbar.prototype.addEventListeners = function addEventListeners () {
   this.thumbY && this.thumbY.addEventListener('touchstart', this.onThumbYMouseDown.bind(this));
   window.addEventListener('touchend', this.onThumbDragStop.bind(this));
 
-  window.addEventListener('resize', debounce(this.resize.bind(this), 250), false);
+  window.addEventListener('resize', debounce(this.update.bind(this), 250), false);
 };
 
 /**

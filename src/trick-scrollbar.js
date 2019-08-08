@@ -38,7 +38,7 @@ export default class TrickScrollbar {
     this.thumbY.style.top = `${newY}%`
   }
 
-  resize () {
+  update () {
     this.handleScroll()
     this.thumbX && this.resizeScrollbarX()
     this.thumbY && this.resizeScrollbarY()
@@ -182,7 +182,7 @@ export default class TrickScrollbar {
     this.thumbY && this.thumbY.addEventListener('touchstart', this.onThumbYMouseDown.bind(this))
     window.addEventListener('touchend', this.onThumbDragStop.bind(this))
 
-    window.addEventListener('resize', debounce(this.resize.bind(this), 250), false)
+    window.addEventListener('resize', debounce(this.update.bind(this), 250), false)
   }
 }
 

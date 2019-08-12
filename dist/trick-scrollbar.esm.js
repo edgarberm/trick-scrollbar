@@ -5,6 +5,7 @@ var this$1 = undefined;
 var TrickScrollbar = function TrickScrollbar (element) {
   this.scroller = element;
   this.wrapper;
+  this.scrollbarX;
   this.scrollbarY;
   this.thumbY;
   this.thumbX;
@@ -12,6 +13,10 @@ var TrickScrollbar = function TrickScrollbar (element) {
   this.draggingX = false;
   this.draggingY = false;
 
+  this.init();
+};
+
+TrickScrollbar.prototype.init = function init () {
   this.assembleDOM();
   this.chechChildrenWidth();
   this.appendThumbX();

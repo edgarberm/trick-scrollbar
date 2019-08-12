@@ -4,6 +4,7 @@ export default class TrickScrollbar {
   constructor (element) {
     this.scroller = element
     this.wrapper
+    this.scrollbarX
     this.scrollbarY
     this.thumbY
     this.thumbX
@@ -11,6 +12,10 @@ export default class TrickScrollbar {
     this.draggingX = false
     this.draggingY = false
 
+    this.init()
+  }
+
+  init () {
     this.assembleDOM()
     this.chechChildrenWidth()
     this.appendThumbX()

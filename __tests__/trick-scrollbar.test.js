@@ -58,12 +58,12 @@ describe('TrickScrollbar', () => {
     new TrickScrollbar(scroller)
 
     setTimeout(() => {
-      const scrollContent = document.querySelector('.ts-scroll-content')
-      const scroller = scrollContent.querySelector('.ts-scroller')
-      const scrollbarX = scrollContent.querySelector('.ts-scrollbar-x')
-      const scrollbarY = scrollContent.querySelector('.ts-scrollbar-y')
-      const thumbX = scrollbarX.querySelector('.ts-thumb-x')
-      const thumbY = thumbY.querySelector('.ts-thumb-y')
+      const scrollContent = document.find('.ts-scroll-content')
+      const scroller = scrollContent.find('.ts-scroller')
+      const scrollbarX = scrollContent.find('.ts-scrollbar-x')
+      const scrollbarY = scrollContent.find('.ts-scrollbar-y')
+      const thumbX = scrollbarX.find('.ts-thumb-x')
+      const thumbY = thumbY.find('.ts-thumb-y')
 
       expect(scrollContent).toBeEqual(HTMLDivElement)
       expect(scroller).toBeEqual(HTMLDivElement)
@@ -72,5 +72,12 @@ describe('TrickScrollbar', () => {
       expect(thumbX).toBeEqual(HTMLDivElement)
       expect(thumbY).toBeEqual(HTMLDivElement)
     }, 200)
+  })
+  
+  it('Fire mousedown event correctly', () => {
+    document.documentElement.innerHTML = html
+    const scroller = document.querySelector('.scroll')
+    new TrickScrollbar(scroller)
+    const mockTrickScrollbar = TrickScrollbar.mock.instances[0]
   })
 })
